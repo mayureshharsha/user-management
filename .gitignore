@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 HELP.md
 /target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -25,7 +25,6 @@ HELP.md
 /nbdist/
 /.nb-gradle/
 /build/
-=======
 # Compiled class file
 *.class
 
@@ -49,4 +48,4 @@ HELP.md
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
->>>>>>> c5ceaa81e632a97c4fd77d3e4d805237a5285e41
+
