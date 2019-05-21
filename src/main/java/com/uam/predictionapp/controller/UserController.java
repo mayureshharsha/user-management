@@ -2,6 +2,7 @@ package com.uam.predictionapp.controller;
 
 import java.util.List;
 
+import com.uam.predictionapp.model.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uam.predictionapp.model.User;
 import com.uam.predictionapp.service.UserService;
 
 @RestController("${userManagement.baseUrl}")
@@ -24,30 +24,30 @@ public class UserController {
 	
 	@GetMapping("/users")
 	public ResponseEntity<?> getAllUsers() {
-		List<User> users = userService.getAllUsers();
-		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+		List<UserEntity> userEntities = userService.getAllUsers();
+		return new ResponseEntity<List<UserEntity>>(userEntities, HttpStatus.OK);
 	}
 	
 	@GetMapping("/users/{id}")
 	public ResponseEntity<?> getUser(@PathVariable Long id) {
-		return new ResponseEntity<User>(userService.getUser(id), HttpStatus.OK);
+		return new ResponseEntity<UserEntity>(userService.getUser(id), HttpStatus.OK);
 	}
 	
 	@PostMapping("/users")
-	public ResponseEntity<?> createUser(@RequestBody User user) {
-		userService.create(user);
-		return new ResponseEntity<User>(HttpStatus.CREATED);
+	public ResponseEntity<?> createUser(@RequestBody UserEntity userEntity) {
+		userService.create(userEntity);
+		return new ResponseEntity<UserEntity>(HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/users")
-	public ResponseEntity<?> updateUser(@RequestBody User user) {
-		userService.update(user);
-		return new ResponseEntity<User>(HttpStatus.ACCEPTED);
+	public ResponseEntity<?> updateUser(@RequestBody UserEntity userEntity) {
+		userService.update(userEntity);
+		return new ResponseEntity<UserEntity>(HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping("/users/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 		userService.delete(id);
-		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<UserEntity>(HttpStatus.NO_CONTENT);
 	}
 }
