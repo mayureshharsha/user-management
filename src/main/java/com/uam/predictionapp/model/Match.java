@@ -12,8 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 public class Match {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
     private Long matchId;
 
     private String venue;
