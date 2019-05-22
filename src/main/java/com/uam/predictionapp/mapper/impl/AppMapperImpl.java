@@ -3,9 +3,13 @@ package com.uam.predictionapp.mapper.impl;
 import com.uam.predictionapp.mapper.AppMapper;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.entity.PredictionEntity;
+import com.uam.predictionapp.model.entity.PredictionId;
+import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class AppMapperImpl implements AppMapper {
@@ -19,10 +23,15 @@ public class AppMapperImpl implements AppMapper {
             return null;
         }
         PredictionEntity predictionEntity = new PredictionEntity();
-        predictionEntity.setUserEntity(userRepository.findById(predictionDto.getUser_id()).get());
-        predictionEntity.setMatchId(predictionDto.getMatchId());
+        PredictionId predictionEntityId = new PredictionId();
+        predictionEntityId.setMatchId(predictionDto.getMatchId());
+        final Optional<UserEntity> userEntity = userRepository.findById(predictionDto.getUserId());
+        if (!userEntity.isPresent()){
+            return null;
+        }
+        predictionEntityId.setUserEntity(userEntity.get());
+        predictionEntity.setId(predictionEntityId);
         predictionEntity.setHomeResult(predictionDto.getHomeResult());
-        predictionEntity.setId(predictionDto.getId());
         return predictionEntity;
     }
 
@@ -32,10 +41,9 @@ public class AppMapperImpl implements AppMapper {
             return null;
         }
         PredictionDto predictionDto = new PredictionDto();
-        predictionDto.setUser_id(predictionEntity.getUserEntity().getId());
+        predictionDto.setUserId(predictionEntity.getId().getUserEntity().getId());
         predictionDto.setHomeResult(predictionEntity.getHomeResult());
-        predictionDto.setMatchId(predictionEntity.getMatchId());
-        predictionDto.setId(predictionEntity.getId());
+        predictionDto.setMatchId(predictionEntity.getId().getMatchId());
         return predictionDto;
     }
 }

@@ -21,15 +21,15 @@ public class PredictionController {
         return new ResponseEntity<List<PredictionDto>>(predictions, HttpStatus.OK);
     }
 
-    @GetMapping("/predictions/{id}")
-    public ResponseEntity<?> getPrediction(@PathVariable Long id) {
-        return new ResponseEntity<PredictionDto>(predictionService.getPrediction(id), HttpStatus.OK);
+    @GetMapping("/predictions/{userId}/{matchId}")
+    public ResponseEntity<?> getPrediction(@PathVariable Long userId, @PathVariable Long matchId) {
+        return new ResponseEntity<PredictionDto>(predictionService.getPrediction(userId, matchId), HttpStatus.OK);
     }
 
     @PostMapping("/predictions")
     public ResponseEntity<?> createPrediction(@RequestBody PredictionDto prediction) {
-        predictionService.create(prediction);
-        return new ResponseEntity<PredictionDto>(HttpStatus.CREATED);
+        final boolean result = predictionService.create(prediction);
+        return result ? new ResponseEntity<PredictionDto>(HttpStatus.CREATED) : new ResponseEntity<PredictionDto>(HttpStatus.FORBIDDEN);
     }
 
     @PutMapping("/predictions")

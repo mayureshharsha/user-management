@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity()
 @Table(
         name = "Result",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"userId"})}
 )
 @NoArgsConstructor
 @Data
@@ -18,7 +18,7 @@ public class ResultEntity {
     private Long id;
 
     @OneToOne()
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "userId", referencedColumnName = "id")
     private UserEntity user;
 
     private Long points;

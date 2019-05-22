@@ -3,7 +3,10 @@ package com.uam.predictionapp.service;
 import com.uam.predictionapp.mapper.AppMapper;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.entity.PredictionEntity;
+import com.uam.predictionapp.model.entity.PredictionId;
+import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.PredictionRepository;
+import com.uam.predictionapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,9 @@ public class PredictionService {
     PredictionRepository predictionRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     AppMapper appMapper;
 
     public List<PredictionDto> getAllPredictions() {
@@ -29,13 +35,25 @@ public class PredictionService {
         return predictionDtos;
     }
 
-    public PredictionDto getPrediction(Long id) {
-        Optional<PredictionEntity> prediction = predictionRepository.findById(id);
-        return appMapper.predictionEntityToDto(prediction.get());
+    public PredictionDto getPrediction(Long userId, Long matchId) {
+        Optional<UserEntity> userEntity = userRepository.findById(userId);
+        if(!userEntity.isPresent()){
+            return null;
+        }
+        List<PredictionEntity> prediction = predictionRepository.findPredictionEntityById_MatchIdAndId_UserEntity(matchId, userEntity.get());
+        if(prediction.size() < 1){
+            return null;
+        }
+        return appMapper.predictionEntityToDto(prediction.get(0));
     }
 
-    public void create(PredictionDto predictionDto) {
+    public boolean create(PredictionDto predictionDto) {
+        PredictionDto prediction = getPrediction(predictionDto.getUserId(), predictionDto.getMatchId());
+        if(prediction != null){
+            return false;
+        }
         predictionRepository.save(appMapper.predictionDtoToEntity(predictionDto));
+        return true;
     }
 
     public void update(PredictionDto predictionDto) {
@@ -43,6 +61,6 @@ public class PredictionService {
     }
 
     public void delete(Long id) {
-        predictionRepository.deleteById(id);
+        predictionRepository.deleteById(null);
     }
 }

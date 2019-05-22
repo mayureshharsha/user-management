@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class PredictionDto {
 
-    private Long id;
-
-    private Long user_id;
+    private Long userId;
 
     private Long matchId;
 
