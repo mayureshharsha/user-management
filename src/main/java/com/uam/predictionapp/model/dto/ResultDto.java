@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ResultDto {
-    private String userName;
+    private String username;
     private Long points;
 }

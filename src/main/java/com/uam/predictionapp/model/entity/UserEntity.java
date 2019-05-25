@@ -8,11 +8,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name="User")
+@Entity()
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@Table(
+		name="User",
+		uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})}
+)
 public class UserEntity {
 
 	@Id

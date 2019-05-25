@@ -17,8 +17,9 @@ public class MatchService {
 
     private List<Match> matches;
 
-    public void loadMatches(){
+    public List<Match> loadMatches(){
         matches = matchesClient.getMatches();
+        return matches;
     }
 
     public Optional<Match> getMatch(Long id){

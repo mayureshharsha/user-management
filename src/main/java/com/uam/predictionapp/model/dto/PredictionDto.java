@@ -19,10 +19,8 @@ public class PredictionDto {
     @Range(min = 1, max = 48)
     private Long matchId;
 
-    @NotNull
     private MatchPredict homeResult;
 
-    @NotNull
     private TossPredict tossResult;
 
     private String momResult;

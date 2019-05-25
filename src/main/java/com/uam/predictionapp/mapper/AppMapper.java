@@ -35,6 +35,8 @@ public abstract class AppMapper {
         predictionEntityId.setUserEntity(userEntity.get());
         predictionEntity.setId(predictionEntityId);
         predictionEntity.setHomeResult(predictionDto.getHomeResult());
+        predictionEntity.setTossResult(predictionDto.getTossResult());
+        predictionEntity.setMomResult(predictionDto.getMomResult());
         return predictionEntity;
     }
 
@@ -46,11 +48,13 @@ public abstract class AppMapper {
         predictionDto.setUserId(predictionEntity.getId().getUserEntity().getId());
         predictionDto.setHomeResult(predictionEntity.getHomeResult());
         predictionDto.setMatchId(predictionEntity.getId().getMatchId());
+        predictionDto.setTossResult(predictionEntity.getTossResult());
+        predictionDto.setMomResult(predictionEntity.getMomResult());
         return predictionDto;
     }
 
     @Mappings({
-            @Mapping(target = "userName", source = "user.username")
+            @Mapping(target = "username", source = "user.username")
     })
     public abstract ResultDto resultEntityToDto(ResultEntity resultEntity);
 }

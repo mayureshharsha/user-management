@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.uam.predictionapp.contants.AppConstants.INITIAL_POINTS;
+
 @Service
 public class ResultService {
     private final ResultRepository resultRepository;
@@ -24,6 +26,8 @@ public class ResultService {
     private final MatchService matchService;
 
     private final PredictionService predictionService;
+
+    private final UserService userService;
 
     private final AppMapper appMapper;
 
@@ -49,7 +53,7 @@ public class ResultService {
 
     public ResultService(@Autowired ResultRepository resultRepository, @Autowired MatchService matchService,
                          @Autowired PredictionService predictionService,
-                         @Autowired AppMapper appMapper,
+                         @Autowired UserService userService, @Autowired AppMapper appMapper,
                          @Value("${game.match.winPoints}") long matchWinPoints,
                          @Value("${game.match.losePoints}") long matchLosePoints,
                          @Value("${game.match.noPredictPoints}") long matchNoPredictPoints,
@@ -63,6 +67,7 @@ public class ResultService {
         this.resultRepository = resultRepository;
         this.matchService = matchService;
         this.predictionService = predictionService;
+        this.userService = userService;
         this.appMapper = appMapper;
 
         MATCH_WIN_POINTS = matchWinPoints;
@@ -90,22 +95,25 @@ public class ResultService {
 
     @Scheduled(cron = "${updateResult.cron}")
     public void calculate() {
-        matchService.loadMatches();
-        List<PredictionDto> allPredictions = predictionService.getAllPredictions();
+        final List<Match> matches = matchService.loadMatches();
+        final List<UserEntity> users = userService.getAllUsers();
         clearAllPoints();
-        allPredictions.parallelStream().forEach(predictionDto -> {
-            Long matchId = predictionDto.getMatchId();
-            Long userId = predictionDto.getUserId();
+        users.parallelStream().forEach(user -> matches.stream().forEach(match -> {
+            Long userId = user.getId();
             Optional<ResultEntity> resultEntityOptional = resultRepository.findByUserId(userId);
-            ResultEntity resultEntity = resultEntityOptional.isPresent() ? resultEntityOptional.get() : ResultEntity.builder().user(UserEntity.builder().id(userId).build()).points(0l).build();
+            ResultEntity resultEntity;
+            if(resultEntityOptional.isPresent()){
+                resultEntity = resultEntityOptional.get();
+            } else {
+                return;
+            }
             Long existingPoints = resultEntity.getPoints();
-            Optional<Match> match = matchService.getMatch(matchId);
-            if (match.isPresent() && match.get().getHomeResult() != null && isValidTime(match.get())) {
-                Long finalPoints = evaluatePoints(predictionDto, existingPoints, match.get());
+            if (match.getHomeResult() != null && isValidTime(match)) {
+                Long finalPoints = evaluatePoints(existingPoints, match, userId);
                 resultEntity.setPoints(finalPoints);
                 resultRepository.save(resultEntity);
             }
-        });
+        }));
     }
 
     private boolean isValidTime(Match match) {
@@ -116,16 +124,22 @@ public class ResultService {
         return match.getDateTime().toInstant().getEpochSecond() < currentInstant.getEpochSecond();
     }
 
-    private long evaluatePoints(PredictionDto predictionDto, Long existingPoints, Match match) {
+    private long evaluatePoints(Long existingPoints, Match match, Long userId) {
         Long updatedPoints = existingPoints;
+
+        PredictionDto predictionDto = predictionService.getPrediction(userId, match.getMatchId());
+        /*Penalise for not predicting*/
+        if (predictionDto == null) {
+            return existingPoints + this.MATCH_NO_PREDICT_POINTS + this.TOSS_NO_PREDICT_POINTS + this.MOM_LOSE_POINTS;
+        }
         updatedPoints += evaluatePointsForMatch(predictionDto, match);
         updatedPoints += evaluatePointsForToss(predictionDto, match);
-        updatedPoints += evaluatePointsForMom(predictionDto, match);
+//        updatedPoints += evaluatePointsForMom(predictionDto, match);
         return updatedPoints;
     }
 
     private long evaluatePointsForMatch(PredictionDto predictionDto, Match match) {
-        if (match.getTossResult() == null) {
+        if (match.getHomeResult() == null) {
             return 0;
         }
         if (predictionDto.getHomeResult() == null) {
@@ -136,7 +150,7 @@ public class ResultService {
     }
 
     private long evaluatePointsForToss(PredictionDto predictionDto, Match match) {
-        if (match.getMomResult() == null) {
+        if (match.getTossResult() == null) {
             return 0;
         }
         if (predictionDto.getTossResult() == null) {
@@ -155,6 +169,6 @@ public class ResultService {
     }
 
     private void clearAllPoints() {
-        resultRepository.setPoints(0l);
+        resultRepository.setPoints(INITIAL_POINTS);
     }
 }
