@@ -33,6 +33,6 @@ spring:
         username: root
     jpa:
         hibernate:
-            ddl-auto: update
+            ddl-auto: create
             dialect: org.hibernate.dialect.MySQLDialect
         show-sql: true

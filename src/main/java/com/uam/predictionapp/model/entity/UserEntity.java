@@ -1,6 +1,7 @@
 package com.uam.predictionapp.model.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,9 +18,11 @@ public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
+	@NotNull
 	private String username;
-	
+
+	@NotNull
 	private String password;
 
 	@Column(name = "first_name")

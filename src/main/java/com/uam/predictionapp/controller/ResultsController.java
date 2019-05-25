@@ -1,6 +1,6 @@
 package com.uam.predictionapp.controller;
 
-import com.uam.predictionapp.model.entity.ResultEntity;
+import com.uam.predictionapp.model.dto.ResultDto;
 import com.uam.predictionapp.service.ResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ public class ResultsController {
 
     @GetMapping("/results")
     public ResponseEntity<?> getAllResults() {
-        List<ResultEntity> results = resultService.listResults();
+        List<ResultDto> results = resultService.listResults();
         return new ResponseEntity<>(results, HttpStatus.OK);
     }
 
