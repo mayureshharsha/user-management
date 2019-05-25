@@ -1,0 +1,38 @@
+game:
+    match:
+        losePoints: -50
+        winPoints: 100
+        noPredictPoints: -100
+    toss:
+        losePoints: -25
+        winPoints: 50
+        noPredictPoints: -50
+#    currently inactive
+    mom:
+        winPoints: 0
+        losePoints: 0
+        noPredictPoints: 0
+
+matchMgmt:
+    baseUrl: v1/matchMgmt
+predictionMgmt:
+    baseUrl: v1/predmgmt
+resultMgmt:
+    baseUrl: v1/resultMgmt
+userMgmt:
+    baseUrl: v1/usermgmt
+
+server:
+    port: 8090
+
+spring:
+    datasource:
+        driverClassName: com.mysql.cj.jdbc.Driver
+        password: root
+        url: jdbc:mysql://localhost:3306/predictionDB
+        username: root
+    jpa:
+        hibernate:
+            ddl-auto: update
+            dialect: org.hibernate.dialect.MySQLDialect
+        show-sql: true

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("${predictionMgmt.baseUrl}")
+@RestController
+@RequestMapping("${predictionMgmt.baseUrl}")
 public class PredictionController {
 
     @Autowired
@@ -18,29 +19,29 @@ public class PredictionController {
     @GetMapping("/predictions")
     public ResponseEntity<?> getAllPredictions() {
         List<PredictionDto> predictions = predictionService.getAllPredictions();
-        return new ResponseEntity<List<PredictionDto>>(predictions, HttpStatus.OK);
+        return new ResponseEntity<>(predictions, HttpStatus.OK);
     }
 
     @GetMapping("/predictions/{userId}/{matchId}")
     public ResponseEntity<?> getPrediction(@PathVariable Long userId, @PathVariable Long matchId) {
-        return new ResponseEntity<PredictionDto>(predictionService.getPrediction(userId, matchId), HttpStatus.OK);
+        return new ResponseEntity<>(predictionService.getPrediction(userId, matchId), HttpStatus.OK);
     }
 
     @PostMapping("/predictions")
     public ResponseEntity<?> createPrediction(@RequestBody PredictionDto prediction) {
         final boolean result = predictionService.create(prediction);
-        return result ? new ResponseEntity<PredictionDto>(HttpStatus.CREATED) : new ResponseEntity<PredictionDto>(HttpStatus.FORBIDDEN);
+        return result ? new ResponseEntity<>(HttpStatus.CREATED) : new ResponseEntity<PredictionDto>(HttpStatus.FORBIDDEN);
     }
 
     @PutMapping("/predictions")
     public ResponseEntity<?> updatePrediction(@RequestBody PredictionDto prediction) {
         predictionService.update(prediction);
-        return new ResponseEntity<PredictionDto>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/predictions/{id}")
     public ResponseEntity<?> deletePrediction(@PathVariable Long id) {
         predictionService.delete(id);
-        return new ResponseEntity<PredictionDto>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

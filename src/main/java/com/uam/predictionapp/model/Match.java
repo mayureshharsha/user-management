@@ -1,6 +1,7 @@
 package com.uam.predictionapp.model;
 
-import com.uam.predictionapp.contants.Predict;
+import com.uam.predictionapp.contants.MatchPredict;
+import com.uam.predictionapp.contants.TossPredict;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,9 +18,13 @@ public class Match {
 
     private Team awayTeam;
 
-    private String dateTime;
+    private Date dateTime;
 
-    private Predict homeResult;
+    private MatchPredict homeResult;
+
+    private TossPredict tossResult;
+
+    private String momResult;
 }
 /*
 {

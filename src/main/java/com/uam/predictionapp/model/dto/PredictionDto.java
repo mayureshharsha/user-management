@@ -1,6 +1,7 @@
 package com.uam.predictionapp.model.dto;
 
-import com.uam.predictionapp.contants.Predict;
+import com.uam.predictionapp.contants.MatchPredict;
+import com.uam.predictionapp.contants.TossPredict;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,5 +13,9 @@ public class PredictionDto {
 
     private Long matchId;
 
-    private Predict homeResult;
+    private MatchPredict homeResult;
+
+    private TossPredict tossResult;
+
+    private String momResult;
 }

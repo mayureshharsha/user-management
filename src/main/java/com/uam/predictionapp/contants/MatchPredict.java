@@ -1,5 +1,5 @@
 package com.uam.predictionapp.contants;
 
-public enum Predict {
+public enum MatchPredict {
     W, L, D
 }
