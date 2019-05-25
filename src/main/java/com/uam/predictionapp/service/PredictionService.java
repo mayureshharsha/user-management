@@ -1,15 +1,18 @@
 package com.uam.predictionapp.service;
 
 import com.uam.predictionapp.mapper.AppMapper;
+import com.uam.predictionapp.model.Match;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.entity.PredictionEntity;
-import com.uam.predictionapp.model.entity.PredictionId;
 import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.PredictionRepository;
 import com.uam.predictionapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,14 +20,20 @@ import java.util.Optional;
 @Service
 public class PredictionService {
 
-    @Autowired
-    PredictionRepository predictionRepository;
+    @Value("${predictionTimeLimit}")
+    private final int amountToSubtract = 1;
 
     @Autowired
-    UserRepository userRepository;
+    private PredictionRepository predictionRepository;
 
     @Autowired
-    AppMapper appMapper;
+    private UserRepository userRepository;
+
+    @Autowired
+    private AppMapper appMapper;
+
+    @Autowired
+    private MatchService matchService;
 
     public List<PredictionDto> getAllPredictions() {
         List<PredictionEntity> predictionEntities = (List<PredictionEntity>) predictionRepository.findAll();
@@ -36,6 +45,7 @@ public class PredictionService {
     }
 
     public PredictionDto getPrediction(Long userId, Long matchId) {
+        /*Check if user is registered*/
         Optional<UserEntity> userEntity = userRepository.findById(userId);
         if(!userEntity.isPresent()){
             return null;
@@ -48,6 +58,12 @@ public class PredictionService {
     }
 
     public boolean create(PredictionDto predictionDto) {
+        final long timeLimit = getTimeLimit();
+        final Optional<Match> match = matchService.getMatch(predictionDto.getMatchId());
+        /*check for timeout*/
+        if(match.isPresent() && match.get().getDateTime().toInstant().getEpochSecond() < timeLimit){
+            return false;
+        }
         PredictionDto prediction = getPrediction(predictionDto.getUserId(), predictionDto.getMatchId());
         if(prediction != null){
             return false;
@@ -62,5 +78,10 @@ public class PredictionService {
 
     public void delete(Long id) {
         predictionRepository.deleteById(null);
+    }
+
+    private long getTimeLimit() {
+        Instant instant = Instant.now().minus(amountToSubtract, ChronoUnit.HOURS);
+        return instant.getEpochSecond();
     }
 }

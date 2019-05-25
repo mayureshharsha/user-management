@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class PredictionController {
     }
 
     @PostMapping("/predictions")
-    public ResponseEntity<?> createPrediction(@RequestBody PredictionDto prediction) {
+    public ResponseEntity<?> createPrediction(@RequestBody @Valid PredictionDto prediction) {
         final boolean result = predictionService.create(prediction);
         return result ? new ResponseEntity<>(HttpStatus.CREATED) : new ResponseEntity<PredictionDto>(HttpStatus.FORBIDDEN);
     }

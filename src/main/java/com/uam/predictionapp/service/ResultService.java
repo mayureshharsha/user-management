@@ -9,8 +9,10 @@ import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,8 @@ public class ResultService {
 
     private final long MOM_NO_PREDICT_POINTS;
 
+    private final boolean validateTimeCheck;
+
     public ResultService(@Autowired ResultRepository resultRepository, @Autowired MatchService matchService,
                          @Autowired PredictionService predictionService,
                          @Autowired AppMapper appMapper,
@@ -54,8 +58,8 @@ public class ResultService {
                          @Value("${game.toss.noPredictPoints}") long tossNoPredictPoints,
                          @Value("${game.mom.winPoints}") long momWinPoints,
                          @Value("${game.mom.losePoints}") long momLosePoints,
-                         @Value("${game.mom.noPredictPoints}") long momNoPredictPoints
-    ) {
+                         @Value("${game.mom.noPredictPoints}") long momNoPredictPoints,
+                         @Value("${validateTimeCheck}") boolean validateTimeCheck) {
         this.resultRepository = resultRepository;
         this.matchService = matchService;
         this.predictionService = predictionService;
@@ -72,6 +76,7 @@ public class ResultService {
         MOM_WIN_POINTS = momWinPoints;
         MOM_LOSE_POINTS = momLosePoints;
         MOM_NO_PREDICT_POINTS = momNoPredictPoints;
+        this.validateTimeCheck = validateTimeCheck;
     }
 
     public List<ResultDto> listResults() {
@@ -83,10 +88,11 @@ public class ResultService {
         return resultDtos;
     }
 
+    @Scheduled(cron = "${updateResult.cron}")
     public void calculate() {
+        matchService.loadMatches();
         List<PredictionDto> allPredictions = predictionService.getAllPredictions();
         clearAllPoints();
-        matchService.loadMatches();
         allPredictions.parallelStream().forEach(predictionDto -> {
             Long matchId = predictionDto.getMatchId();
             Long userId = predictionDto.getUserId();
@@ -94,13 +100,20 @@ public class ResultService {
             ResultEntity resultEntity = resultEntityOptional.isPresent() ? resultEntityOptional.get() : ResultEntity.builder().user(UserEntity.builder().id(userId).build()).points(0l).build();
             Long existingPoints = resultEntity.getPoints();
             Optional<Match> match = matchService.getMatch(matchId);
-            if (match.isPresent() && match.get().getHomeResult() != null) {
+            if (match.isPresent() && match.get().getHomeResult() != null && isValidTime(match.get())) {
                 Long finalPoints = evaluatePoints(predictionDto, existingPoints, match.get());
                 resultEntity.setPoints(finalPoints);
                 resultRepository.save(resultEntity);
             }
         });
+    }
 
+    private boolean isValidTime(Match match) {
+        if (!validateTimeCheck) {
+            return true;
+        }
+        Instant currentInstant = Instant.now();
+        return match.getDateTime().toInstant().getEpochSecond() < currentInstant.getEpochSecond();
     }
 
     private long evaluatePoints(PredictionDto predictionDto, Long existingPoints, Match match) {

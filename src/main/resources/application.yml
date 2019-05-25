@@ -1,3 +1,7 @@
+spring:
+  profiles:
+    active: dev
+
 game:
     match:
         losePoints: -50
@@ -25,14 +29,9 @@ userMgmt:
 server:
     port: 8090
 
-spring:
-    datasource:
-        driverClassName: com.mysql.cj.jdbc.Driver
-        password: root
-        url: jdbc:mysql://localhost:3306/predictionDB
-        username: root
-    jpa:
-        hibernate:
-            ddl-auto: create
-            dialect: org.hibernate.dialect.MySQLDialect
-        show-sql: true
+updateResult:
+    cron: 0 0 0,12 * * * #Cron expression to run cron job at 12 am and 12 pm everyday
+
+predictionTimeLimit: 1 # 1 hour before the match
+
+validateTimeCheck: false # should be set true on prod

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.uam.predictionapp.service.UserService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("${userMgmt.baseUrl}")
 public class UserController {
@@ -29,7 +31,7 @@ public class UserController {
 	}
 	
 	@PostMapping("/users")
-	public ResponseEntity<?> createUser(@RequestBody UserEntity userEntity) {
+	public ResponseEntity<?> createUser(@RequestBody @Valid UserEntity userEntity) {
 		userService.create(userEntity);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
