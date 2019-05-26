@@ -2,8 +2,8 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    password: root
-    url: jdbc:mysql://localhost:3306/predictionDB
+    password: Cricped@123
+    url: jdbc:mysql://cric_pred_mysql:3306/prediction_db
     username: root
   jpa:
     hibernate:

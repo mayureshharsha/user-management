@@ -1,5 +1,7 @@
 package com.uam.predictionapp.service;
 
+import com.uam.predictionapp.model.TokenDto;
+import com.uam.predictionapp.model.dto.UserDto;
 import com.uam.predictionapp.model.entity.ResultEntity;
 import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.ResultRepository;
@@ -9,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.uam.predictionapp.contants.AppConstants.INITIAL_POINTS;
+import static com.uam.predictionapp.contants.AppConstants.TOKEN_HASH_MAP;
 
 @Service
 public class UserService {
@@ -52,5 +56,20 @@ public class UserService {
 
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public TokenDto login(UserDto userDto) {
+
+        final Optional<UserEntity> userEntity = userRepository.findByUsername(userDto.getUsername());
+        if(!userEntity.isPresent()){
+            return null;
+        }
+        final UserEntity entity = userEntity.get();
+        if(entity.getPassword().equals(userDto.getPassword()) && entity.getUsername().equals(userDto.getUsername())){
+            final TokenDto tokenDto = TokenDto.builder().userId(entity.getId()).token(UUID.randomUUID().toString()).build();
+            TOKEN_HASH_MAP.put(tokenDto.getUserId(), tokenDto.getToken());
+            return tokenDto;
+        }
+        return null;
     }
 }

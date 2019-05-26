@@ -2,6 +2,8 @@ package com.uam.predictionapp.controller;
 
 import java.util.List;
 
+import com.uam.predictionapp.model.TokenDto;
+import com.uam.predictionapp.model.dto.UserDto;
 import com.uam.predictionapp.model.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,14 @@ public class UserController {
 	public ResponseEntity<?> getAllUsers() {
 		List<UserEntity> userEntities = userService.getAllUsers();
 		return new ResponseEntity<>(userEntities, HttpStatus.OK);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity login(@RequestBody UserDto userDto) {
+		final TokenDto token = userService.login(userDto);
+		if(token != null)
+			return new ResponseEntity<>(token, HttpStatus.OK);
+		return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 	}
 	
 	@GetMapping("/users/{id}")
