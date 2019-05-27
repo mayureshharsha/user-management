@@ -2,6 +2,9 @@ version: "3"
 services:
   db:
     image: "mysql"
+    command: --init-file /init.sql
+    volumes:
+        - ./init.sql:/init.sql
     ports:
       - "3306:3306"
     environment:
