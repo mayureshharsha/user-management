@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+  db:
+    image: "mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=toor
+  service:
+    image: "cricped-backend"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/prediction_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: toor
