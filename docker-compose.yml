@@ -2,11 +2,18 @@ version: "3"
 services:
   db:
     image: "mysql"
+    ports:
+      - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD="toor"
-      - ON_CREATE_DB="prediction_db"
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: prediction_db
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: secret
   service:
     image: "cricped-backend"
+    ports:
+      - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/prediction_db
       SPRING_DATASOURCE_USERNAME: root
