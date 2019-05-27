@@ -3,8 +3,8 @@ services:
   db:
     image: "mysql"
     environment:
-      - MYSQL_ROOT_PASSWORD=toor
-      - MYSQL_DATABASE=prediction_db
+      - MYSQL_ROOT_PASSWORD="toor"
+      - ON_CREATE_DB="prediction_db"
   service:
     image: "cricped-backend"
     environment:
