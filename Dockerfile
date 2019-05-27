@@ -7,9 +7,10 @@ RUN ls -la
 
 FROM openjdk:8-jdk-alpine as deploy
 COPY --from=builder /server/target/UserAccessManagement-0.0.1-SNAPSHOT.jar .
+RUN chmod 777 UserAccessManagement-0.0.1-SNAPSHOT.jar
 VOLUME /tmp
-EXPOSE 8080
 RUN ls -ltr
 ARG JAR_FILE=/UserAccessManagement-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
+EXPOSE 8080
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
