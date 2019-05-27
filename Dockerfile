@@ -1,4 +1,6 @@
 FROM maven:latest
+COPY . /server
+WORKDIR /server
 RUN mvn clean install
 RUN ls -la
 
