@@ -45,4 +45,10 @@ public class PredictionController {
         predictionService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/predictionsByUser/{userId}")
+    public ResponseEntity<?> getPredictionsByUser(@PathVariable Long userId){
+        List<PredictionDto> predictionDtos = predictionService.getPredictionsByUser(userId);
+        return new ResponseEntity<List<PredictionDto>>(predictionDtos, HttpStatus.OK);
+    }
 }

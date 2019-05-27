@@ -84,4 +84,13 @@ public class PredictionService {
         Instant instant = Instant.now().minus(amountToSubtract, ChronoUnit.HOURS);
         return instant.getEpochSecond();
     }
+
+    public List<PredictionDto> getPredictionsByUser(Long userId) {
+        final List<PredictionEntity> predictionEntities = predictionRepository.findAllByUserId(userId);
+        List<PredictionDto> predictionDtos = new ArrayList<>();
+        predictionEntities.forEach(predictionEntity -> {
+            predictionDtos.add(appMapper.predictionEntityToDto(predictionEntity));
+        });
+        return predictionDtos;
+    }
 }
