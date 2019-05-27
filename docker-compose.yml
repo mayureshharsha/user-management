@@ -2,7 +2,7 @@ version: "3"
 services:
   db:
     image: "mysql:latest"
-    command: --init-file init.sql
+    command: --init-file /init.sql
     volumes:
         - ./init.sql:/init.sql
     ports:
