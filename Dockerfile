@@ -1,7 +1,7 @@
 FROM maven:latest
 COPY . /server
 WORKDIR /server
-RUN mvn clean install
+RUN mvn clean install -DskipTests=true
 RUN ls -la
 
 #FROM alpine:latest  
