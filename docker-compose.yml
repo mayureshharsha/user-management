@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3"
 services:
   db:
     image: "mysql"
@@ -10,3 +10,5 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/prediction_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: toor
+    depends_on:
+      - db
