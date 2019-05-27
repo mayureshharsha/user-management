@@ -4,6 +4,7 @@ services:
     image: "mysql"
     environment:
       - MYSQL_ROOT_PASSWORD=toor
+      - MYSQL_DATABASE=prediction_db
   service:
     image: "cricped-backend"
     environment:
