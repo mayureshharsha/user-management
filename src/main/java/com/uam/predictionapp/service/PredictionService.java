@@ -88,9 +88,13 @@ public class PredictionService {
     public List<PredictionDto> getPredictionsByUser(Long userId) {
         final List<PredictionEntity> predictionEntities = predictionRepository.findAllByUserId(userId);
         List<PredictionDto> predictionDtos = new ArrayList<>();
+        matchService.loadMatches();
         predictionEntities.forEach(predictionEntity -> {
-            predictionDtos.add(appMapper.predictionEntityToDto(predictionEntity));
+            PredictionDto predictionDto = appMapper.predictionEntityToDto(predictionEntity);
+            predictionDto.setMatch(matchService.getMatch(predictionDto.getMatchId()).get());
+            predictionDtos.add(predictionDto);
         });
+
         return predictionDtos;
     }
 }

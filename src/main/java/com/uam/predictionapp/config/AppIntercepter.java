@@ -17,7 +17,7 @@ public class AppIntercepter implements HandlerInterceptor {
     @Override
     public boolean preHandle(
             HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        try {
+        /*try {
             final String cookie = request.getHeader("cookie");
             if(request.getMethod().equals(HttpMethod.OPTIONS) || request.getRequestURI().equals("/v1/usermgmt/login")
             || request.getRequestURI().equals("/v1/usermgmt/users")){
@@ -32,8 +32,8 @@ public class AppIntercepter implements HandlerInterceptor {
             }
         }catch (Exception e){
             e.printStackTrace();
-        }
-        return false;
+        }*/
+        return true;
     }
     @Override
     public void postHandle(

@@ -12,7 +12,9 @@ spring:
     show-sql: true
 
 dataJson:
-  url: https://raw.githubusercontent.com/aniket7777777/cricpred/master/Data_Matches.json
+  url: https://raw.githubusercontent.com/aniket7777777/cricpred/branch/testing/Data_Matches.json
+
+#  https://raw.githubusercontent.com/aniket7777777/cricpred/master/Data_Matches.json
 
 #SPRING_DATASOURCE_URL='jdbc:mysql://mysql:3306/prediction_db'
 

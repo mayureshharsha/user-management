@@ -7,7 +7,8 @@ import com.uam.predictionapp.contants.TossPredict;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name="Prediction")
+@Entity
+@Table(name = "Prediction")
 @NoArgsConstructor
 @Data
 public class PredictionEntity {
