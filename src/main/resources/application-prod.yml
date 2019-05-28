@@ -2,9 +2,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    password: Cricped@123
-    url: jdbc:mysql://cric_pred_mysql:3306/prediction_db
-    username: root
+    password:
+    url:
+    username:
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,4 +12,12 @@ spring:
     show-sql: true
 
 dataJson:
-  url: https://raw.githubusercontent.com/aniket7777777/cricpred/master/Data_Matches.json
+  url: https://raw.githubusercontent.com/aniket7777777/cricpred/branch/testing/Data_Matches.json
+
+#  https://raw.githubusercontent.com/aniket7777777/cricpred/master/Data_Matches.json
+
+#SPRING_DATASOURCE_URL='jdbc:mysql://mysql:3306/prediction_db'
+
+#SPRING_DATASOURCE_PASSWORD='Cricped@123'
+
+#SPRING_DATASOURCE_USERNAME='root'

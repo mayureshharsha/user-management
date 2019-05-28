@@ -1,7 +1,9 @@
 package com.uam.predictionapp.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uam.predictionapp.contants.MatchPredict;
 import com.uam.predictionapp.contants.TossPredict;
+import com.uam.predictionapp.model.Match;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -19,9 +21,14 @@ public class PredictionDto {
     @Range(min = 1, max = 48)
     private Long matchId;
 
+    @NotNull
     private MatchPredict homeResult;
 
+    @NotNull
     private TossPredict tossResult;
 
+    @JsonIgnore
     private String momResult;
+
+    private Match match;
 }

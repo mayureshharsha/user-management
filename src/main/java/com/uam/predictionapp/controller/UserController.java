@@ -21,7 +21,7 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
-	@GetMapping("/users")
+//	@GetMapping("/users")
 	public ResponseEntity<?> getAllUsers() {
 		List<UserEntity> userEntities = userService.getAllUsers();
 		return new ResponseEntity<>(userEntities, HttpStatus.OK);
@@ -35,7 +35,7 @@ public class UserController {
 		return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 	}
 	
-	@GetMapping("/users/{id}")
+//	@GetMapping("/users/{id}")
 	public ResponseEntity<?> getUser(@PathVariable Long id) {
 		return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK);
 	}
@@ -46,13 +46,13 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/users")
+//	@PutMapping("/users")
 	public ResponseEntity<?> updateUser(@RequestBody UserEntity userEntity) {
 		userService.update(userEntity);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
-	@DeleteMapping("/users/{id}")
+//	@DeleteMapping("/users/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 		userService.delete(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
