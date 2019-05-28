@@ -19,7 +19,8 @@ public class AppIntercepter implements HandlerInterceptor {
             HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         try {
             final String cookie = request.getHeader("cookie");
-            if(request.getMethod().equals(HttpMethod.OPTIONS) || request.getRequestURI().equals("/v1/usermgmt/login")){
+            if(request.getMethod().equals(HttpMethod.OPTIONS) || request.getRequestURI().equals("/v1/usermgmt/login")
+            || request.getRequestURI().equals("/v1/usermgmt/users")){
                 return true;
             }
             ObjectMapper objectMapper = new ObjectMapper();
