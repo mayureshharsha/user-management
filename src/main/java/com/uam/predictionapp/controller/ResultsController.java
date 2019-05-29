@@ -2,6 +2,7 @@ package com.uam.predictionapp.controller;
 
 import com.uam.predictionapp.model.dto.ResultDto;
 import com.uam.predictionapp.service.ResultService;
+import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -22,6 +24,8 @@ public class ResultsController {
     @GetMapping("/results")
     public ResponseEntity<?> getAllResults() {
         List<ResultDto> results = resultService.listResults();
+        results.sort(Comparator.comparingLong(ResultDto::getPoints)
+                .reversed());
         return new ResponseEntity<>(results, HttpStatus.OK);
     }
 
