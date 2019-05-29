@@ -6,6 +6,7 @@ import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.dto.ResultDto;
 import com.uam.predictionapp.model.entity.ResultEntity;
 import com.uam.predictionapp.model.entity.UserEntity;
+import com.uam.predictionapp.repository.PredictionRepository;
 import com.uam.predictionapp.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,8 @@ public class ResultService {
     private final PredictionService predictionService;
 
     private final UserService userService;
+
+    private final PredictionRepository predictionRepository;
 
     private final AppMapper appMapper;
 
@@ -53,7 +56,9 @@ public class ResultService {
 
     public ResultService(@Autowired ResultRepository resultRepository, @Autowired MatchService matchService,
                          @Autowired PredictionService predictionService,
-                         @Autowired UserService userService, @Autowired AppMapper appMapper,
+                         @Autowired UserService userService,
+                         @Autowired PredictionRepository predictionRepository,
+                         @Autowired AppMapper appMapper,
                          @Value("${game.match.winPoints}") long matchWinPoints,
                          @Value("${game.match.losePoints}") long matchLosePoints,
                          @Value("${game.match.noPredictPoints}") long matchNoPredictPoints,
@@ -82,6 +87,7 @@ public class ResultService {
         MOM_LOSE_POINTS = momLosePoints;
         MOM_NO_PREDICT_POINTS = momNoPredictPoints;
         this.validateTimeCheck = validateTimeCheck;
+        this.predictionRepository = predictionRepository;
     }
 
     public List<ResultDto> listResults() {
@@ -102,7 +108,7 @@ public class ResultService {
             Long userId = user.getId();
             Optional<ResultEntity> resultEntityOptional = resultRepository.findByUserId(userId);
             ResultEntity resultEntity;
-            if(resultEntityOptional.isPresent()){
+            if (resultEntityOptional.isPresent()) {
                 resultEntity = resultEntityOptional.get();
             } else {
                 return;
@@ -129,7 +135,11 @@ public class ResultService {
 
         PredictionDto predictionDto = predictionService.getPrediction(userId, match.getMatchId());
         /*Penalise for not predicting*/
-        if (predictionDto == null) {
+        if (predictionDto == null || predictionDto.getHomeResult() == null) {
+            predictionRepository.save(appMapper.predictionDtoToEntity(
+                    PredictionDto.builder().
+                            matchId(match.getMatchId()).userId(userId).homeResult(null).tossResult(null).
+                            build()));
             return existingPoints + this.MATCH_NO_PREDICT_POINTS + this.TOSS_NO_PREDICT_POINTS + this.MOM_LOSE_POINTS;
         }
         updatedPoints += evaluatePointsForMatch(predictionDto, match);
@@ -170,5 +180,10 @@ public class ResultService {
 
     private void clearAllPoints() {
         resultRepository.setPoints(INITIAL_POINTS);
+    }
+
+    public Long getPoint(Long userId) {
+        final Optional<ResultEntity> resultEntity = resultRepository.findByUserId(userId);
+        return resultEntity.get().getPoints();
     }
 }

@@ -6,10 +6,7 @@ import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +24,12 @@ public class ResultsController {
         results.sort(Comparator.comparingLong(ResultDto::getPoints)
                 .reversed());
         return new ResponseEntity<>(results, HttpStatus.OK);
+    }
+
+    @GetMapping("/results/{userId}")
+    public ResponseEntity<?> getAllResults(@PathVariable Long userId) {
+        Long point = resultService.getPoint(userId);
+        return new ResponseEntity<>(point, HttpStatus.OK);
     }
 
     @PostMapping("/results/calculate")

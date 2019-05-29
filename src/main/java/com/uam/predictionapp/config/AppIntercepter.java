@@ -19,15 +19,23 @@ public class AppIntercepter implements HandlerInterceptor {
             HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         /*try {
             final String cookie = request.getHeader("cookie");
-            if(request.getMethod().equals(HttpMethod.OPTIONS) || request.getRequestURI().equals("/v1/usermgmt/login")
-            || request.getRequestURI().equals("/v1/usermgmt/users")){
+            if(canFilter(request)){
                 return true;
             }
+            if(cookie.equals(""))
+                return false;
             ObjectMapper objectMapper = new ObjectMapper();
             final TokenDto tokenDto = objectMapper.readValue(cookie, TokenDto.class);
+            if(tokenDto == null){
+                return false;
+            }
             final Long userId = tokenDto.getUserId();
             final String token = tokenDto.getToken();
-            if(TOKEN_HASH_MAP.get(userId).equals(token)){
+            final String actualToken = TOKEN_HASH_MAP.get(userId);
+            if (actualToken == null){
+                return false;
+            }
+            if(actualToken.equals(token)){
                 return true;
             }
         }catch (Exception e){
@@ -35,6 +43,14 @@ public class AppIntercepter implements HandlerInterceptor {
         }*/
         return true;
     }
+
+    private boolean canFilter(HttpServletRequest request) {
+        return request.getMethod().equals(HttpMethod.OPTIONS) ||
+                request.getRequestURI().equals("/v1/usermgmt/login") ||
+                request.getRequestURI().equals("/v1/usermgmt/users") ||
+                request.getRequestURI().equals("/v1/resultMgmt/results/calculate");
+    }
+
     @Override
     public void postHandle(
             HttpServletRequest request, HttpServletResponse response, Object handler,

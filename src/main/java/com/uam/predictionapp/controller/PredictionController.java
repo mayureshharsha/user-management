@@ -1,6 +1,7 @@
 package com.uam.predictionapp.controller;
 
 import com.uam.predictionapp.model.dto.PredictionDto;
+import com.uam.predictionapp.model.dto.ResultDto;
 import com.uam.predictionapp.service.PredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -49,6 +51,7 @@ public class PredictionController {
     @GetMapping("/predictionsByUser/{userId}")
     public ResponseEntity<?> getPredictionsByUser(@PathVariable Long userId){
         List<PredictionDto> predictionDtos = predictionService.getPredictionsByUser(userId);
+        predictionDtos.sort(Comparator.comparingLong(PredictionDto::getMatchId).reversed());
         return new ResponseEntity<List<PredictionDto>>(predictionDtos, HttpStatus.OK);
     }
 }
