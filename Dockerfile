@@ -6,9 +6,7 @@ WORKDIR /server/target
 RUN ls -la
 
 FROM openjdk:8-jdk-alpine as deploy
-COPY --from=builder /server/init.sql init.sql
 COPY --from=builder /server/target/UserAccessManagement-0.0.1-SNAPSHOT.jar app.jar
-RUN chmod 777 init.sql
 RUN chmod 777 app.jar
 VOLUME /tmp
 RUN ls -ltr
