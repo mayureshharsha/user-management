@@ -26,7 +26,10 @@ public class AppFilter implements Filter {
         System.out.println("Remote Host:" + request.getRemoteHost());
         System.out.println("Remote Address:" + request.getRemoteAddr());
         final HttpServletResponse servletResponse = (HttpServletResponse) response;
-
+        servletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        servletResponse.setHeader("Access-Control-Allow-Credentials", "true");
+        servletResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, HEAD, OPTIONS");
+        servletResponse.setHeader("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Set-Cookie");
         try {
             final HttpServletRequest servletRequest = (HttpServletRequest) request;
             final String cookie = servletRequest.getHeader("cookie");
