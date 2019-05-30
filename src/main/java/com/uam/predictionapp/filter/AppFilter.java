@@ -26,7 +26,7 @@ public class AppFilter implements Filter {
         System.out.println("Remote Host:" + request.getRemoteHost());
         System.out.println("Remote Address:" + request.getRemoteAddr());
         final HttpServletResponse servletResponse = (HttpServletResponse) response;
-        servletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        servletResponse.setHeader("Access-Control-Allow-Origin", "http://cricpred.s3-website.ap-south-1.amazonaws.com");
         servletResponse.setHeader("Access-Control-Allow-Credentials", "true");
         servletResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, HEAD, OPTIONS");
         servletResponse.setHeader("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Set-Cookie");
@@ -70,6 +70,7 @@ public class AppFilter implements Filter {
         return request.getMethod().equals(HttpMethod.OPTIONS) ||
                 request.getRequestURI().equals("/v1/usermgmt/login") ||
                 request.getRequestURI().equals("/v1/usermgmt/users") ||
+                request.getMethod().equals(HttpMethod.OPTIONS.toString()) ||
                 request.getRequestURI().equals("/v1/resultMgmt/results/calculate");
     }
 
