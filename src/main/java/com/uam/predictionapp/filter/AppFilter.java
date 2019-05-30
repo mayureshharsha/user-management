@@ -2,6 +2,7 @@ package com.uam.predictionapp.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uam.predictionapp.model.TokenDto;
+import org.apache.catalina.connector.RequestFacade;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class AppFilter implements Filter {
         System.out.println("Remote Host:" + request.getRemoteHost());
         System.out.println("Remote Address:" + request.getRemoteAddr());
         final HttpServletResponse servletResponse = (HttpServletResponse) response;
-        servletResponse.setHeader("Access-Control-Allow-Origin", "http://cricpred.s3-website.ap-south-1.amazonaws.com");
+        servletResponse.setHeader("Access-Control-Allow-Origin", ((RequestFacade) request).getHeader("origin"));
         servletResponse.setHeader("Access-Control-Allow-Credentials", "true");
         servletResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, HEAD, OPTIONS");
         servletResponse.setHeader("Access-Control-Allow-Headers", "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Set-Cookie");
@@ -38,12 +39,14 @@ public class AppFilter implements Filter {
                 return;
             }
             if (cookie == null || cookie.isEmpty()) {
+                System.out.println("cookie null");
                 servletResponse.sendError(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
             ObjectMapper objectMapper = new ObjectMapper();
             final TokenDto tokenDto = objectMapper.readValue(cookie, TokenDto.class);
             if (tokenDto == null) {
+                System.out.println("token null");
                 servletResponse.sendError(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
@@ -51,6 +54,7 @@ public class AppFilter implements Filter {
             final String token = tokenDto.getToken();
             final String actualToken = TOKEN_HASH_MAP.get(userId);
             if (actualToken == null) {
+                System.out.println("actual token null");
                 servletResponse.sendError(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
