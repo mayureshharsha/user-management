@@ -42,8 +42,8 @@ public class UserController {
 	
 	@PostMapping("/users")
 	public ResponseEntity<?> createUser(@RequestBody @Valid UserEntity userEntity) {
-		userService.create(userEntity);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		boolean created = userService.create(userEntity);
+		return created? new ResponseEntity<>(HttpStatus.CREATED): new ResponseEntity<>(HttpStatus.FORBIDDEN);
 	}
 	
 //	@PutMapping("/users")
