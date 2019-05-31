@@ -27,10 +27,16 @@ public class UserService {
 
     /**
      * @param userEntity
+     * @return
      */
-    public void create(UserEntity userEntity) {
+    public boolean create(UserEntity userEntity) {
+        Optional<UserEntity> byUsername = userRepository.findByUsername(userEntity.getUsername());
+        if(byUsername.isPresent()){
+            return false;
+        }
         userRepository.save(userEntity);
         createResultForUser(userEntity.getUsername());
+        return true;
     }
 
     public void update(UserEntity userEntity) {
