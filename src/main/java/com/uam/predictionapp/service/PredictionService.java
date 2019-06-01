@@ -58,11 +58,14 @@ public class PredictionService {
     }
 
     public boolean create(PredictionDto predictionDto) {
-        final long timeLimit = getTimeLimit();
+        final long currentTime = getCurrentTime();
         final Optional<Match> match = matchService.getMatch(predictionDto.getMatchId());
         /*check for timeout*/
-        if(match.isPresent() && match.get().getDateTime().toInstant().getEpochSecond() < timeLimit){
-            return false;
+        if(match.isPresent()) {
+            final long matchTime = match.get().getDateTime().toInstant().minus(amountToSubtract,ChronoUnit.HOURS).getEpochSecond();
+            if (matchTime < currentTime) {
+                return false;
+            }
         }
         PredictionDto prediction = getPrediction(predictionDto.getUserId(), predictionDto.getMatchId());
         if(prediction != null){
@@ -80,8 +83,8 @@ public class PredictionService {
         predictionRepository.deleteById(null);
     }
 
-    private long getTimeLimit() {
-        Instant instant = Instant.now().minus(amountToSubtract, ChronoUnit.HOURS);
+    private long getCurrentTime() {
+        Instant instant = Instant.now();
         return instant.getEpochSecond();
     }
 

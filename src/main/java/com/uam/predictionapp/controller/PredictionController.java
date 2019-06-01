@@ -25,7 +25,7 @@ public class PredictionController {
         return new ResponseEntity<>(predictions, HttpStatus.OK);
     }
 
-    @GetMapping("/predictions/{userId}/{matchId}")
+//    @GetMapping("/predictions/{userId}/{matchId}")
     public ResponseEntity<?> getPrediction(@PathVariable Long userId, @PathVariable Long matchId) {
         return new ResponseEntity<>(predictionService.getPrediction(userId, matchId), HttpStatus.OK);
     }
@@ -36,13 +36,13 @@ public class PredictionController {
         return result ? new ResponseEntity<>(HttpStatus.CREATED) : new ResponseEntity<PredictionDto>(HttpStatus.FORBIDDEN);
     }
 
-    @PutMapping("/predictions")
+//    @PutMapping("/predictions")
     public ResponseEntity<?> updatePrediction(@RequestBody PredictionDto prediction) {
         predictionService.update(prediction);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("/predictions/{id}")
+//    @DeleteMapping("/predictions/{id}")
     public ResponseEntity<?> deletePrediction(@PathVariable Long id) {
         predictionService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
