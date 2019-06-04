@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -28,5 +29,15 @@ public class MatchService {
         }
         Stream<Match> matchStream = matches.parallelStream().filter(match -> match.getMatchId().equals(id));
         return matchStream.findFirst();
+    }
+
+    public Match getLatestMatchPlayed() {
+        if (matches == null){
+            loadMatches();
+        }
+        List<Match> matches = this.matches;
+        matches.sort(Comparator.comparingLong(Match::getMatchId).reversed());
+        final Optional<Match> optionalMatch = matches.stream().filter(match -> match.getHomeResult() != null).findFirst();
+        return optionalMatch.get();
     }
 }

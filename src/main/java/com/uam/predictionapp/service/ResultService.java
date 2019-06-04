@@ -4,9 +4,11 @@ import com.uam.predictionapp.mapper.AppMapper;
 import com.uam.predictionapp.model.Match;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.dto.ResultDto;
+import com.uam.predictionapp.model.entity.RanksEntity;
 import com.uam.predictionapp.model.entity.ResultEntity;
 import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.PredictionRepository;
+import com.uam.predictionapp.repository.RanksRepository;
 import com.uam.predictionapp.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +16,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +35,8 @@ public class ResultService {
     private final UserService userService;
 
     private final PredictionRepository predictionRepository;
+
+    private final RanksRepository ranksRepository;
 
     private final AppMapper appMapper;
 
@@ -59,6 +65,7 @@ public class ResultService {
                          @Autowired UserService userService,
                          @Autowired PredictionRepository predictionRepository,
                          @Autowired AppMapper appMapper,
+                         @Autowired RanksRepository ranksRepository,
                          @Value("${game.match.winPoints}") long matchWinPoints,
                          @Value("${game.match.losePoints}") long matchLosePoints,
                          @Value("${game.match.noPredictPoints}") long matchNoPredictPoints,
@@ -74,6 +81,7 @@ public class ResultService {
         this.predictionService = predictionService;
         this.userService = userService;
         this.appMapper = appMapper;
+        this.ranksRepository = ranksRepository;
 
         MATCH_WIN_POINTS = matchWinPoints;
         MATCH_LOSE_POINTS = matchLosePoints;
@@ -120,6 +128,18 @@ public class ResultService {
                 resultRepository.save(resultEntity);
             }
         }));
+    }
+
+    private void calculateRanks(){
+        final List<RanksEntity> ranksEntities = (List<RanksEntity>) ranksRepository.findAll();
+        ranksRepository.setCurrentRank();
+        final Date previousDate = ranksEntities.get(0).getPreviousDate();
+        final Match latestMatchPlayed = matchService.getLatestMatchPlayed();
+        if(latestMatchPlayed.getDateTime().toInstant().getEpochSecond() > previousDate.toInstant().getEpochSecond()){
+            ranksRepository.resetPreviousDate(new Date());
+            ranksRepository.setCurrentRank();
+        }
+        ranksRepository.updateRankStatus();
     }
 
     private boolean isValidTime(Match match) {

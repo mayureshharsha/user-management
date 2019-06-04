@@ -26,4 +26,6 @@ public class ResultEntity {
     private UserEntity user;
 
     private Long points;
+
+    private int rank;
 }
