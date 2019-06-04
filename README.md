@@ -1,2 +1,2 @@
-# user-management
-micro-service to authorize and authenticate users for prediction api
+# userEntity-management
+micro-service to authorize and authenticate userEntities for prediction api

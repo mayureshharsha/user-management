@@ -1,0 +1,37 @@
+spring:
+  profiles:
+    active: prod
+
+game:
+    match:
+        losePoints: -50
+        winPoints: 100
+        noPredictPoints: -100
+    toss:
+        losePoints: -25
+        winPoints: 50
+        noPredictPoints: -50
+#    currently inactive
+    mom:
+        winPoints: 0
+        losePoints: 0
+        noPredictPoints: 0
+
+matchMgmt:
+    baseUrl: v1/matchMgmt
+predictionMgmt:
+    baseUrl: v1/predmgmt
+resultMgmt:
+    baseUrl: v1/resultMgmt
+userMgmt:
+    baseUrl: v1/usermgmt
+
+server:
+    port: 8090
+
+updateResult:
+    cron: 0 0 0,12 * * * #Cron expression to run cron job at 12 am and 12 pm everyday
+
+predictionTimeLimit: 1 # 1 hour before the match
+
+validateTimeCheck: false # should be set true on prod
