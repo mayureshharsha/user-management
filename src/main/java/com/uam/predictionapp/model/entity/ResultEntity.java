@@ -27,13 +27,4 @@ public class ResultEntity {
     private UserEntity user;
 
     private Long points;
-
-    @Column(name = "current_rank")
-    private int currentRank;
-
-    @Column(name = "previous_rank")
-    private int previousRank;
-
-    @Column(name = "previous_date")
-    private Date previousDate;
 }

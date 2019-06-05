@@ -4,9 +4,11 @@ import com.uam.predictionapp.mapper.AppMapper;
 import com.uam.predictionapp.model.Match;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.dto.ResultDto;
+import com.uam.predictionapp.model.entity.RankingEntity;
 import com.uam.predictionapp.model.entity.ResultEntity;
 import com.uam.predictionapp.model.entity.UserEntity;
 import com.uam.predictionapp.repository.PredictionRepository;
+import com.uam.predictionapp.repository.RankingRepository;
 import com.uam.predictionapp.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,8 @@ public class ResultService {
     private final UserService userService;
 
     private final PredictionRepository predictionRepository;
+
+    private final RankingRepository rankingRepository;
 
     private final AppMapper appMapper;
 
@@ -60,6 +64,7 @@ public class ResultService {
                          @Autowired UserService userService,
                          @Autowired PredictionRepository predictionRepository,
                          @Autowired AppMapper appMapper,
+                         @Autowired RankingRepository rankingRepository,
                          @Value("${game.match.winPoints}") long matchWinPoints,
                          @Value("${game.match.losePoints}") long matchLosePoints,
                          @Value("${game.match.noPredictPoints}") long matchNoPredictPoints,
@@ -75,6 +80,7 @@ public class ResultService {
         this.predictionService = predictionService;
         this.userService = userService;
         this.appMapper = appMapper;
+        this.rankingRepository = rankingRepository;
 
         MATCH_WIN_POINTS = matchWinPoints;
         MATCH_LOSE_POINTS = matchLosePoints;
@@ -125,13 +131,19 @@ public class ResultService {
     }
 
     private void calculateRanks() {
-        final Date previousDate = resultRepository.getOne().get().getPreviousDate();
+        final ArrayList<RankingEntity> rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
+        if (rankingEntities.isEmpty()){
+            rankingRepository.setCurrentRank();
+            rankingRepository.resetPreviousDateRank(new Date());
+            return;
+        }
+        final Date previousDate = rankingEntities.get(0).getPreviousDate();
         final Match latestMatchPlayed = matchService.getLatestMatchPlayed();
         if ((previousDate == null) ||
                 latestMatchPlayed.getDateTime().toInstant().getEpochSecond() > previousDate.toInstant().getEpochSecond()) {
-            resultRepository.resetPreviousDate(new Date());
+            rankingRepository.resetPreviousDateRank(new Date());
         }
-        resultRepository.setCurrentRank();
+        rankingRepository.setCurrentRank();
     }
 
     private boolean isValidTime(Match match) {
