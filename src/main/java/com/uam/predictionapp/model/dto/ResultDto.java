@@ -1,6 +1,5 @@
 package com.uam.predictionapp.model.dto;
 
-import com.uam.predictionapp.contants.RankStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +8,6 @@ import lombok.NoArgsConstructor;
 public class ResultDto {
     private String username;
     private Long points;
-    private int rank;
-    private RankStatus rankStatus;
+    private int currentRank;
+    private int previousRank;
 }

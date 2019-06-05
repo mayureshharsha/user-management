@@ -35,7 +35,7 @@ public class AppFilter implements Filter {
             final String headerToken = servletRequest.getHeader("Token");
             System.out.println("cookie: " + cookie);
             System.out.println("headerToken: " + headerToken);
-            String userToken = headerToken!=null? headerToken: cookie;
+            String userToken = headerToken != null ? headerToken : cookie;
             if (canFilter(servletRequest)) {
                 filterchain.doFilter(request, response);
                 return;
