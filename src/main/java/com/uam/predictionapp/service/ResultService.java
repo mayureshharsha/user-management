@@ -98,12 +98,8 @@ public class ResultService {
     }
 
     public List<ResultDto> listResults() {
-        List<ResultEntity> resultEntities = (List<ResultEntity>) resultRepository.findAll();
-        List<ResultDto> resultDtos = new ArrayList<>();
-        resultEntities.forEach(resultEntity -> {
-            resultDtos.add(appMapper.resultEntityToDto(resultEntity));
-        });
-        return resultDtos;
+        final List<ResultDto> results = rankingRepository.getResults();
+        return results;
     }
 
     @Scheduled(cron = "${updateResult.cron}")
@@ -121,7 +117,7 @@ public class ResultService {
                 return;
             }
             Long existingPoints = resultEntity.getPoints();
-            if (match.getHomeResult() != null && isValidTime(match)) {
+            if (match.getTossResult() != null && isValidTime(match)) {
                 Long finalPoints = evaluatePoints(existingPoints, match, userId);
                 resultEntity.setPoints(finalPoints);
                 resultRepository.save(resultEntity);
@@ -131,19 +127,15 @@ public class ResultService {
     }
 
     private void calculateRanks() {
+        rankingRepository.setCurrentRank();
         final ArrayList<RankingEntity> rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
-        if (rankingEntities.isEmpty()){
-            rankingRepository.setCurrentRank();
-            rankingRepository.resetPreviousDateRank(new Date());
-            return;
-        }
         final Date previousDate = rankingEntities.get(0).getPreviousDate();
         final Match latestMatchPlayed = matchService.getLatestMatchPlayed();
+
         if ((previousDate == null) ||
                 latestMatchPlayed.getDateTime().toInstant().getEpochSecond() > previousDate.toInstant().getEpochSecond()) {
             rankingRepository.resetPreviousDateRank(new Date());
         }
-        rankingRepository.setCurrentRank();
     }
 
     private boolean isValidTime(Match match) {

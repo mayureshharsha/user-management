@@ -53,8 +53,8 @@ public abstract class AppMapper {
         return predictionDto;
     }
 
-    @Mappings({
+ /*   @Mappings({
             @Mapping(target = "username", source = "user.username")
-    })
-    public abstract ResultDto resultEntityToDto(ResultEntity resultEntity);
+    })*/
+//    public abstract ResultDto resultEntityToDto(ResultEntity resultEntity);
 }

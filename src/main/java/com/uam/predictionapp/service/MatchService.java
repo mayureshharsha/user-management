@@ -37,7 +37,7 @@ public class MatchService {
         }
         List<Match> matches = this.matches;
         matches.sort(Comparator.comparingLong(Match::getMatchId).reversed());
-        final Optional<Match> optionalMatch = matches.stream().filter(match -> match.getHomeResult() != null).findFirst();
+        final Optional<Match> optionalMatch = matches.stream().filter(match -> match.getTossResult() != null).findFirst();
         return optionalMatch.get();
     }
 }
