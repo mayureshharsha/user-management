@@ -15,6 +15,6 @@ public interface ResultRepository extends CrudRepository<ResultEntity, Long> {
     @Query("UPDATE ResultEntity r SET r.points=:point")
     void setPoints(@Param("point") Long point);
 
-//    @Query(value = "SELECT points FROM result WHERE userid=:userId", nativeQuery = true)
-    Optional<ResultEntity> findByUserId(@Param("userId") Long userId);
+    //    @Query(value = "SELECT points FROM result WHERE userid=:userId", nativeQuery = true)
+    Optional<ResultEntity> findByUserId(Long userId);
 }

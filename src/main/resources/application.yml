@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: dev
 
 game:
     match:
@@ -33,5 +33,3 @@ updateResult:
     cron: 0 0 0,12 * * * #Cron expression to run cron job at 12 am and 12 pm everyday
 
 predictionTimeLimit: 1 # 1 hour before the match
-
-validateTimeCheck: false # should be set true on prod
