@@ -69,7 +69,7 @@ public class AppFilter implements Filter {
             servletResponse.sendError(HttpStatus.UNAUTHORIZED.value());
             return;
         }
-        filterchain.doFilter(request, response);
+        servletResponse.sendError(HttpStatus.UNAUTHORIZED.value());
     }
 
     private boolean canFilter(HttpServletRequest request) {
