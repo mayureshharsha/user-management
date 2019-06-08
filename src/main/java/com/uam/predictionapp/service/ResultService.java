@@ -98,8 +98,7 @@ public class ResultService {
     }
 
     public List<ResultDto> listResults() {
-        final List<ResultDto> results = rankingRepository.getResults();
-        return results;
+        return rankingRepository.getResults();
     }
 
     @Scheduled(cron = "${updateResult.cron}")
@@ -117,7 +116,7 @@ public class ResultService {
                 return;
             }
             Long existingPoints = resultEntity.getPoints();
-            if (match.getTossResult() != null && isValidTime(match)) {
+            if (match.getHomeResult() != null && isValidTime(match)) {
                 Long finalPoints = evaluatePoints(existingPoints, match, userId);
                 resultEntity.setPoints(finalPoints);
                 resultRepository.save(resultEntity);
@@ -127,14 +126,19 @@ public class ResultService {
     }
 
     private void calculateRanks() {
-        rankingRepository.setCurrentRank();
-        final ArrayList<RankingEntity> rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
+        ArrayList<RankingEntity> rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
+        if(rankingEntities.isEmpty()){
+            rankingRepository.setCurrentRank();
+            rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
+        }
         final Date previousDate = rankingEntities.get(0).getPreviousDate();
         final Match latestMatchPlayed = matchService.getLatestMatchPlayed();
+        Date latestMatchPlayedDateTime = latestMatchPlayed.getDateTime();
 
         if ((previousDate == null) ||
-                latestMatchPlayed.getDateTime().toInstant().getEpochSecond() > previousDate.toInstant().getEpochSecond()) {
-            rankingRepository.resetPreviousDateRank(new Date());
+                latestMatchPlayedDateTime.toInstant().getEpochSecond() > previousDate.toInstant().getEpochSecond()) {
+            rankingRepository.resetPreviousDateRank(latestMatchPlayedDateTime);
+            rankingRepository.setCurrentRank();
         }
     }
 

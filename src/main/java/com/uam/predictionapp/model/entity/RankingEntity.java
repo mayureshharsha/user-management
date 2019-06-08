@@ -19,16 +19,16 @@ import java.util.Date;
 @Builder
 public class RankingEntity {
     @Id
-    private Long id;
+    private Integer id;
 
     @Column(name = "username")
     private String username;
 
     @Column(name = "current_rank")
-    private int currentRank;
+    private Integer currentRank;
 
     @Column(name = "previous_rank")
-    private int previousRank;
+    private Integer previousRank;
 
     @Column(name = "previous_date")
     private Date previousDate;
