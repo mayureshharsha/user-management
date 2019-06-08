@@ -134,7 +134,7 @@ public class ResultService {
         final Date previousDate = rankingEntities.get(0).getPreviousDate();
         final Match latestMatchPlayed = matchService.getLatestMatchPlayed();
         Date latestMatchPlayedDateTime = latestMatchPlayed.getDateTime();
-
+        System.out.println("latestMatchPlayedDateTime : " + latestMatchPlayedDateTime.toString());
         if ((previousDate == null) ||
                 latestMatchPlayedDateTime.toInstant().getEpochSecond() > previousDate.toInstant().getEpochSecond()) {
             rankingRepository.resetPreviousDateRank(latestMatchPlayedDateTime);
