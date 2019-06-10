@@ -2,9 +2,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    password:
-    url:
-    username:
+    password: Mayuresh123
+    url: jdbc:mysql://mysql:3306
+    username: root
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,3 +23,4 @@ validateTimeCheck: true
 #SPRING_DATASOURCE_PASSWORD='Cricped@123'
 
 #SPRING_DATASOURCE_USERNAME='root'
+#cricpreddb.cuuqnxi1rnsw.us-east-2.rds.amazonaws.compost

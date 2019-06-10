@@ -12,7 +12,9 @@ public class ResultDto {
     public ResultDto(String username, Long points, Integer currentRank, Integer previousRank) {
         this.username = username;
         this.points = points;
-        this.currentRank = currentRank;
+        if(currentRank != null){
+            this.currentRank = currentRank;
+        }
         if (previousRank != null){
             this.previousRank = previousRank;
         }
