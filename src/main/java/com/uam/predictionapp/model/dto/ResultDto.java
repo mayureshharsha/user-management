@@ -9,10 +9,12 @@ public class ResultDto {
     private int currentRank;
     private int previousRank;
 
-    public ResultDto(String username, Long points, int currentRank, int previousRank) {
+    public ResultDto(String username, Long points, Integer currentRank, Integer previousRank) {
         this.username = username;
         this.points = points;
         this.currentRank = currentRank;
-        this.previousRank = previousRank;
+        if (previousRank != null){
+            this.previousRank = previousRank;
+        }
     }
 }
