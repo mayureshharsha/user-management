@@ -57,6 +57,8 @@ public class ResultService {
 
     private final long MOM_NO_PREDICT_POINTS;
 
+    private final long BONUS_POINTS;
+
     private final boolean validateTimeCheck;
 
     public ResultService(@Autowired ResultRepository resultRepository, @Autowired MatchService matchService,
@@ -74,6 +76,7 @@ public class ResultService {
                          @Value("${game.mom.winPoints}") long momWinPoints,
                          @Value("${game.mom.losePoints}") long momLosePoints,
                          @Value("${game.mom.noPredictPoints}") long momNoPredictPoints,
+                         @Value("${game.bonusPoints}") long bonusPoints,
                          @Value("${validateTimeCheck}") boolean validateTimeCheck) {
         this.resultRepository = resultRepository;
         this.matchService = matchService;
@@ -93,6 +96,9 @@ public class ResultService {
         MOM_WIN_POINTS = momWinPoints;
         MOM_LOSE_POINTS = momLosePoints;
         MOM_NO_PREDICT_POINTS = momNoPredictPoints;
+
+        BONUS_POINTS = bonusPoints;
+
         this.validateTimeCheck = validateTimeCheck;
         this.predictionRepository = predictionRepository;
     }
@@ -151,8 +157,6 @@ public class ResultService {
     }
 
     private long evaluatePoints(Long existingPoints, Match match, Long userId) {
-        Long updatedPoints = existingPoints;
-
         PredictionDto predictionDto = predictionService.getPrediction(userId, match.getMatchId());
         /*Penalise for not predicting*/
         if (predictionDto == null || predictionDto.getHomeResult() == null) {
@@ -162,10 +166,13 @@ public class ResultService {
                             build()));
             return existingPoints + this.MATCH_NO_PREDICT_POINTS + this.TOSS_NO_PREDICT_POINTS + this.MOM_LOSE_POINTS;
         }
-        updatedPoints += evaluatePointsForMatch(predictionDto, match);
+        Long updatedPoints = evaluatePointsForMatch(predictionDto, match);
         updatedPoints += evaluatePointsForToss(predictionDto, match);
-//        updatedPoints += evaluatePointsForMom(predictionDto, match);
-        return updatedPoints;
+        updatedPoints += evaluatePointsForMom(predictionDto, match);
+        if(updatedPoints.equals(MATCH_WIN_POINTS + TOSS_WIN_POINTS + MOM_WIN_POINTS)){
+            updatedPoints += BONUS_POINTS;
+        }
+        return updatedPoints + existingPoints;
     }
 
     private long evaluatePointsForMatch(PredictionDto predictionDto, Match match) {
@@ -191,10 +198,13 @@ public class ResultService {
     }
 
     private long evaluatePointsForMom(PredictionDto predictionDto, Match match) {
+        if (match.getMomResult() == null) {
+            return 0;
+        }
         if (predictionDto.getMomResult() == null) {
             return MOM_NO_PREDICT_POINTS;
         } else {
-            return predictionDto.getMomResult().equals(match.getMomResult()) ? MOM_WIN_POINTS : MOM_LOSE_POINTS;
+            return predictionDto.getMomResult().equalsIgnoreCase(match.getMomResult()) ? MOM_WIN_POINTS : MOM_LOSE_POINTS;
         }
     }
 

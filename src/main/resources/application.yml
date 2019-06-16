@@ -11,11 +11,11 @@ game:
         losePoints: -25
         winPoints: 50
         noPredictPoints: -50
-#    currently inactive
     mom:
-        winPoints: 0
+        winPoints: 200
         losePoints: 0
         noPredictPoints: 0
+    bonusPoints: 250
 
 matchMgmt:
     baseUrl: v1/matchMgmt
