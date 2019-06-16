@@ -31,7 +31,6 @@ public class PredictionDto {
     @NotNull
     private TossPredict tossResult;
 
-    @JsonIgnore
     private String momResult;
 
     private Match match;
