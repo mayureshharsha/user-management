@@ -1,6 +1,7 @@
 package com.uam.predictionapp.service;
 
 import com.uam.predictionapp.mapper.AppMapper;
+import com.uam.predictionapp.model.JackPot;
 import com.uam.predictionapp.model.Match;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.entity.PredictionEntity;
@@ -47,11 +48,11 @@ public class PredictionService {
     public PredictionDto getPrediction(Long userId, Long matchId) {
         /*Check if user is registered*/
         Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if(!userEntity.isPresent()){
+        if (!userEntity.isPresent()) {
             return null;
         }
         List<PredictionEntity> prediction = predictionRepository.findPredictionEntityById_MatchIdAndId_UserEntity(matchId, userEntity.get());
-        if(prediction.size() < 1){
+        if (prediction.size() < 1) {
             return null;
         }
         return appMapper.predictionEntityToDto(prediction.get(0));
@@ -61,14 +62,14 @@ public class PredictionService {
         final long currentTime = getCurrentTime();
         final Optional<Match> match = matchService.getMatch(predictionDto.getMatchId());
         /*check for timeout*/
-        if(match.isPresent()) {
-            final long matchTime = match.get().getDateTime().toInstant().minus(amountToSubtract,ChronoUnit.HOURS).getEpochSecond();
+        if (match.isPresent()) {
+            final long matchTime = match.get().getDateTime().toInstant().minus(amountToSubtract, ChronoUnit.HOURS).getEpochSecond();
             if (matchTime < currentTime) {
                 return false;
             }
         }
         PredictionDto prediction = getPrediction(predictionDto.getUserId(), predictionDto.getMatchId());
-        if(prediction != null){
+        if (prediction != null) {
             return false;
         }
         predictionRepository.save(appMapper.predictionDtoToEntity(predictionDto));
@@ -99,5 +100,17 @@ public class PredictionService {
         });
 
         return predictionDtos;
+    }
+
+    public List<JackPot> getJackpotWinners() {
+        final List<Match> latestMatchPlayed = matchService.getLatestMatchPlayed(2);
+        List<JackPot> jackpotWinners = new ArrayList<>();
+        latestMatchPlayed.forEach(match -> {
+            final List<PredictionEntity> winners = predictionRepository.getJackpotWinners(match.getMatchId(), match.getHomeResult(), match.getTossResult(), match.getMomResult());
+            winners.forEach(winner -> {
+                jackpotWinners.add(new JackPot(winner.getId().getUserEntity().getUsername(), match.getMatchId()));
+            });
+        });
+        return jackpotWinners;
     }
 }

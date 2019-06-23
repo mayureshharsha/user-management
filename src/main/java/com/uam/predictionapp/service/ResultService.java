@@ -138,7 +138,7 @@ public class ResultService {
             rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
         }
         final Date previousDate = rankingEntities.get(0).getPreviousDate();
-        final Match latestMatchPlayed = matchService.getLatestMatchPlayed();
+        final Match latestMatchPlayed = matchService.getLatestMatchPlayed(1).get(0);
         Date latestMatchPlayedDateTime = latestMatchPlayed.getDateTime();
         System.out.println("latestMatchPlayedDateTime : " + latestMatchPlayedDateTime.toString());
         if ((previousDate == null) ||

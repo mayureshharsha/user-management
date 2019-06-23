@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -31,13 +32,11 @@ public class MatchService {
         return matchStream.findFirst();
     }
 
-    public Match getLatestMatchPlayed() {
-        if (matches == null){
-            loadMatches();
-        }
+    public List<Match> getLatestMatchPlayed(int count) {
+        loadMatches();
         List<Match> matches = this.matches;
         matches.sort(Comparator.comparingLong(Match::getMatchId).reversed());
-        final Optional<Match> optionalMatch = matches.stream().filter(match -> match.getHomeResult() != null).findFirst();
-        return optionalMatch.get();
+        final List<Match> sortedMatches = matches.stream().filter(match -> match.getHomeResult() != null).collect(Collectors.toList());
+        return sortedMatches.subList(0, count);
     }
 }

@@ -1,7 +1,7 @@
 package com.uam.predictionapp.controller;
 
+import com.uam.predictionapp.model.JackPot;
 import com.uam.predictionapp.model.dto.PredictionDto;
-import com.uam.predictionapp.model.dto.ResultDto;
 import com.uam.predictionapp.service.PredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +19,19 @@ public class PredictionController {
     @Autowired
     PredictionService predictionService;
 
+    @GetMapping("/predictions/jackpotwinners")
+    public ResponseEntity<?> getJackpotWinners() {
+        List<JackPot> jackpotWinners = predictionService.getJackpotWinners();
+        return new ResponseEntity<>(jackpotWinners, HttpStatus.OK);
+    }
+
     @GetMapping("/predictions")
     public ResponseEntity<?> getAllPredictions() {
         List<PredictionDto> predictions = predictionService.getAllPredictions();
         return new ResponseEntity<>(predictions, HttpStatus.OK);
     }
 
-//    @GetMapping("/predictions/{userId}/{matchId}")
+    //    @GetMapping("/predictions/{userId}/{matchId}")
     public ResponseEntity<?> getPrediction(@PathVariable Long userId, @PathVariable Long matchId) {
         return new ResponseEntity<>(predictionService.getPrediction(userId, matchId), HttpStatus.OK);
     }
@@ -36,20 +42,20 @@ public class PredictionController {
         return result ? new ResponseEntity<>(HttpStatus.CREATED) : new ResponseEntity<PredictionDto>(HttpStatus.FORBIDDEN);
     }
 
-//    @PutMapping("/predictions")
+    //    @PutMapping("/predictions")
     public ResponseEntity<?> updatePrediction(@RequestBody PredictionDto prediction) {
         predictionService.update(prediction);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-//    @DeleteMapping("/predictions/{id}")
+    //    @DeleteMapping("/predictions/{id}")
     public ResponseEntity<?> deletePrediction(@PathVariable Long id) {
         predictionService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/predictionsByUser/{userId}")
-    public ResponseEntity<?> getPredictionsByUser(@PathVariable Long userId){
+    public ResponseEntity<?> getPredictionsByUser(@PathVariable Long userId) {
         List<PredictionDto> predictionDtos = predictionService.getPredictionsByUser(userId);
         predictionDtos.sort(Comparator.comparingLong(PredictionDto::getMatchId).reversed());
         return new ResponseEntity<List<PredictionDto>>(predictionDtos, HttpStatus.OK);
