@@ -106,7 +106,7 @@ public class PredictionService {
         final List<Match> latestMatchPlayed = matchService.getLatestMatchPlayed(2);
         List<JackPot> jackpotWinners = new ArrayList<>();
         latestMatchPlayed.forEach(match -> {
-            final List<PredictionEntity> winners = predictionRepository.getJackpotWinners(match.getMatchId(), match.getHomeResult(), match.getTossResult(), match.getMomResult());
+            final List<PredictionEntity> winners = predictionRepository.getJackpotWinners(match.getMatchId(), match.getHomeResult().ordinal(), match.getTossResult().ordinal(), match.getMomResult());
             winners.forEach(winner -> {
                 jackpotWinners.add(new JackPot(winner.getId().getUserEntity().getUsername(), match.getMatchId()));
             });

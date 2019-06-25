@@ -23,7 +23,7 @@ public interface PredictionRepository extends CrudRepository<PredictionEntity, P
             " home_result=:homeResult AND toss_result=:tossResult AND" +
             "  mom_result=:momResult", nativeQuery = true)
     List<PredictionEntity> getJackpotWinners(@Param("matchId")Long matchId,
-                                             @Param("homeResult")MatchPredict homeResult,
-                                             @Param("tossResult") TossPredict tossResult,
+                                             @Param("homeResult") int homeResult,
+                                             @Param("tossResult") int tossResult,
                                              @Param("momResult")String momResult);
 }
