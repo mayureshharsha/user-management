@@ -1,6 +1,5 @@
 package com.uam.predictionapp.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uam.predictionapp.contants.MatchPredict;
 import com.uam.predictionapp.contants.TossPredict;
 import com.uam.predictionapp.model.Match;

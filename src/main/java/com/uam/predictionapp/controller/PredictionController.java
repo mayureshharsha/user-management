@@ -1,6 +1,7 @@
 package com.uam.predictionapp.controller;
 
 import com.uam.predictionapp.model.JackPot;
+import com.uam.predictionapp.model.dto.AddonPredictionDto;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.service.PredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +60,17 @@ public class PredictionController {
         List<PredictionDto> predictionDtos = predictionService.getPredictionsByUser(userId);
         predictionDtos.sort(Comparator.comparingLong(PredictionDto::getMatchId).reversed());
         return new ResponseEntity<List<PredictionDto>>(predictionDtos, HttpStatus.OK);
+    }
+
+    @PostMapping("/predictions/addonPrediction")
+    public ResponseEntity<?> createAddonPrediction(@RequestBody @Valid AddonPredictionDto addonPredictionDto) {
+        predictionService.saveAddonPrediction(addonPredictionDto);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/predictions/addonPrediction/{userId}")
+    public ResponseEntity<?> getAddonPrediction(@RequestParam("userId") Long userId) {
+        final AddonPredictionDto addonPredictionByUser = predictionService.getAddonPredictionByUser(userId);
+        return new ResponseEntity<>(addonPredictionByUser, HttpStatus.ACCEPTED);
     }
 }

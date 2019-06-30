@@ -3,9 +3,12 @@ package com.uam.predictionapp.service;
 import com.uam.predictionapp.mapper.AppMapper;
 import com.uam.predictionapp.model.JackPot;
 import com.uam.predictionapp.model.Match;
+import com.uam.predictionapp.model.dto.AddonPredictionDto;
 import com.uam.predictionapp.model.dto.PredictionDto;
+import com.uam.predictionapp.model.entity.AddonPredictionEntity;
 import com.uam.predictionapp.model.entity.PredictionEntity;
 import com.uam.predictionapp.model.entity.UserEntity;
+import com.uam.predictionapp.repository.AddonPredictionRepository;
 import com.uam.predictionapp.repository.PredictionRepository;
 import com.uam.predictionapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +39,9 @@ public class PredictionService {
 
     @Autowired
     private MatchService matchService;
+
+    @Autowired
+    private AddonPredictionRepository addonPredictionRepository;
 
     public List<PredictionDto> getAllPredictions() {
         List<PredictionEntity> predictionEntities = (List<PredictionEntity>) predictionRepository.findAll();
@@ -112,5 +119,31 @@ public class PredictionService {
             });
         });
         return jackpotWinners;
+    }
+
+    public void saveAddonPrediction(AddonPredictionDto addonPredictionDto) {
+        final Long userId = addonPredictionDto.getUserId();
+        final Optional<AddonPredictionEntity> addonPredictionEntity = addonPredictionRepository.findById(Math.toIntExact(userId));
+
+        if (!addonPredictionEntity.isPresent()) {
+            addonPredictionRepository.save(appMapper.addonPredictionDtoToEntity(addonPredictionDto));
+        } else {
+            final AddonPredictionEntity entity = addonPredictionEntity.get();
+            Date currentDate = new Date();
+
+            if (entity.getHRG() == null) {
+                addonPredictionRepository.updateHRG(addonPredictionDto.getHRG(), currentDate, addonPredictionDto.getUserId());
+            }
+            if (entity.getHWT() == null) {
+                addonPredictionRepository.updateHWT(addonPredictionDto.getHWT(), currentDate, addonPredictionDto.getUserId());
+            }
+            if (entity.getPOT() == null) {
+                addonPredictionRepository.updatePOT(addonPredictionDto.getPOT(), currentDate, addonPredictionDto.getUserId());
+            }
+        }
+    }
+
+    public AddonPredictionDto getAddonPredictionByUser(Long userId) {
+        return appMapper.addonPredictionEntityToDto(addonPredictionRepository.findByUserEntityId(userId));
     }
 }
