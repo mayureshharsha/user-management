@@ -123,13 +123,19 @@ public class PredictionService {
 
     public void saveAddonPrediction(AddonPredictionDto addonPredictionDto) {
         final Long userId = addonPredictionDto.getUserId();
-        final Optional<AddonPredictionEntity> addonPredictionEntity = addonPredictionRepository.findById(Math.toIntExact(userId));
-
-        if (!addonPredictionEntity.isPresent()) {
+        final AddonPredictionEntity addonPredictionEntity = addonPredictionRepository.findByUserEntityId(userId);
+        Date currentDate = new Date();
+        if (addonPredictionEntity == null) {
+            if(addonPredictionDto.getPOT() != null)
+                addonPredictionDto.setPOTDate(currentDate);
+            if(addonPredictionDto.getHRG() != null)
+                addonPredictionDto.setHRGDate(currentDate);
+            if(addonPredictionDto.getHWT() != null)
+                addonPredictionDto.setHWTDate(currentDate);
             addonPredictionRepository.save(appMapper.addonPredictionDtoToEntity(addonPredictionDto));
         } else {
-            final AddonPredictionEntity entity = addonPredictionEntity.get();
-            Date currentDate = new Date();
+            final AddonPredictionEntity entity = addonPredictionEntity;
+
 
             if (entity.getHRG() == null) {
                 addonPredictionRepository.updateHRG(addonPredictionDto.getHRG(), currentDate, addonPredictionDto.getUserId());
