@@ -69,7 +69,7 @@ public class PredictionController {
     }
 
     @GetMapping("/predictions/addonPrediction/{userId}")
-    public ResponseEntity<?> getAddonPrediction(@RequestParam("userId") Long userId) {
+    public ResponseEntity<?> getAddonPrediction(@PathVariable Long userId) {
         final AddonPredictionDto addonPredictionByUser = predictionService.getAddonPredictionByUser(userId);
         return new ResponseEntity<>(addonPredictionByUser, HttpStatus.ACCEPTED);
     }

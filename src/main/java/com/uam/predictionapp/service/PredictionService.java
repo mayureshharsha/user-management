@@ -137,13 +137,13 @@ public class PredictionService {
             final AddonPredictionEntity entity = addonPredictionEntity;
 
 
-            if (entity.getHRG() == null) {
+            if (entity.getHRG() == null && addonPredictionDto.getHRG() != null) {
                 addonPredictionRepository.updateHRG(addonPredictionDto.getHRG(), currentDate, addonPredictionDto.getUserId());
             }
-            if (entity.getHWT() == null) {
+            if (entity.getHWT() == null && addonPredictionDto.getHWT() != null) {
                 addonPredictionRepository.updateHWT(addonPredictionDto.getHWT(), currentDate, addonPredictionDto.getUserId());
             }
-            if (entity.getPOT() == null) {
+            if (entity.getPOT() == null && addonPredictionDto.getPOT() != null) {
                 addonPredictionRepository.updatePOT(addonPredictionDto.getPOT(), currentDate, addonPredictionDto.getUserId());
             }
         }
