@@ -16,16 +16,20 @@ game:
         losePoints: 0
         noPredictPoints: 0
     bonusPoints: 250
+    semisToss:
+      winPoints: 100
     semisMatch:
-      losePoints: -50
-      winPoints: 250
-      noPredictPoints: -100
-      bonus: 500
+      winPoints: 200
+      bonusPoints: 500
+    semisMom:
+      winPoints: 400
+    finalsToss:
+      winPoints: 200
     finalsMatch:
-      losePoints: -50
-      winPoints: 500
-      noPredictPoints: -100
-      bonus: 1000
+      winPoints: 400
+      bonusPoints: 1000
+    finalsMom:
+      winPoints: 800
     players:
       pot: 50
       hwt: 25

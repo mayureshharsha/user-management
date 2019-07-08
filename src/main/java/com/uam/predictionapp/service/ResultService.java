@@ -2,6 +2,7 @@ package com.uam.predictionapp.service;
 
 import com.uam.predictionapp.mapper.AppMapper;
 import com.uam.predictionapp.model.Match;
+import com.uam.predictionapp.model.dto.AddonPredictionDto;
 import com.uam.predictionapp.model.dto.PredictionDto;
 import com.uam.predictionapp.model.dto.ResultDto;
 import com.uam.predictionapp.model.entity.RankingEntity;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +27,18 @@ import static com.uam.predictionapp.contants.AppConstants.INITIAL_POINTS;
 
 @Service
 public class ResultService {
+    private final long HRG_POINTS;
+
+    private final long HWT_POINTS;
+
+    private final long POT_POINTS;
+
+    private final long MATCH_FINALS_WIN_POINTS;
+
+    private final long MATCH_FINALS_TOSS_WIN_POINTS;
+
+    private final long MATCH_FINALS_MOM_WIN_POINTS;
+
     private final ResultRepository resultRepository;
 
     private final MatchService matchService;
@@ -59,7 +73,17 @@ public class ResultService {
 
     private final long BONUS_POINTS;
 
+    private final long SEMIS_BONUS_POINTS;
+
+    private final long FINALS_BONUS_POINTS;
+
     private final boolean validateTimeCheck;
+
+    private final long MATCH_SEMIS_WIN_POINTS;
+
+    private final long MATCH_SEMIS_TOSS_WIN_POINTS;
+
+    private final long MATCH_SEMIS_MOM_WIN_POINTS;
 
     public ResultService(@Autowired ResultRepository resultRepository, @Autowired MatchService matchService,
                          @Autowired PredictionService predictionService,
@@ -76,7 +100,18 @@ public class ResultService {
                          @Value("${game.mom.winPoints}") long momWinPoints,
                          @Value("${game.mom.losePoints}") long momLosePoints,
                          @Value("${game.mom.noPredictPoints}") long momNoPredictPoints,
+                         @Value("${game.semisMatch.winPoints}") long semisWinPoints,
+                         @Value("${game.finalsMatch.winPoints}") long finalsWinPoints,
                          @Value("${game.bonusPoints}") long bonusPoints,
+                         @Value("${game.semisMatch.bonusPoints}") long semisBonusPoints,
+                         @Value("${game.finalsMatch.bonusPoints}") long finalsBonusPoints,
+                         @Value("${game.players.pot}") long potPoints,
+                         @Value("${game.players.hrg}") long hrgPoints,
+                         @Value("${game.players.hwt}") long hwtPoints,
+                         @Value("${game.semisToss.winPoints}") long semisTossWinPoints,
+                         @Value("${game.semisMom.winPoints}") long semisMomWinPoints,
+                         @Value("${game.finalsToss.winPoints}") long finalsTossWinPoints,
+                         @Value("${game.finalsMom.winPoints}") long finalsMomWinPoints,
                          @Value("${validateTimeCheck}") boolean validateTimeCheck) {
         this.resultRepository = resultRepository;
         this.matchService = matchService;
@@ -98,9 +133,24 @@ public class ResultService {
         MOM_NO_PREDICT_POINTS = momNoPredictPoints;
 
         BONUS_POINTS = bonusPoints;
+        SEMIS_BONUS_POINTS = semisBonusPoints;
+        FINALS_BONUS_POINTS = finalsBonusPoints;
 
         this.validateTimeCheck = validateTimeCheck;
         this.predictionRepository = predictionRepository;
+
+        MATCH_SEMIS_WIN_POINTS = semisWinPoints;
+        MATCH_SEMIS_MOM_WIN_POINTS = semisMomWinPoints;
+        MATCH_SEMIS_TOSS_WIN_POINTS = semisTossWinPoints;
+
+        MATCH_FINALS_WIN_POINTS = finalsWinPoints;
+        MATCH_FINALS_TOSS_WIN_POINTS = finalsTossWinPoints;
+        MATCH_FINALS_MOM_WIN_POINTS = finalsMomWinPoints;
+
+
+        POT_POINTS = potPoints;
+        HRG_POINTS = hrgPoints;
+        HWT_POINTS = hwtPoints;
     }
 
     public List<ResultDto> listResults() {
@@ -133,7 +183,7 @@ public class ResultService {
 
     private void calculateRanks() {
         ArrayList<RankingEntity> rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
-        if(rankingEntities.isEmpty()){
+        if (rankingEntities.isEmpty()) {
             rankingRepository.setCurrentRank();
             rankingEntities = (ArrayList<RankingEntity>) rankingRepository.findAll();
         }
@@ -169,10 +219,42 @@ public class ResultService {
         Long updatedPoints = evaluatePointsForMatch(predictionDto, match);
         updatedPoints += evaluatePointsForToss(predictionDto, match);
         updatedPoints += evaluatePointsForMom(predictionDto, match);
-        if(updatedPoints.equals(MATCH_WIN_POINTS + TOSS_WIN_POINTS + MOM_WIN_POINTS)){
-            updatedPoints += BONUS_POINTS;
+
+        if (match.getMatchId().equals(46l) || match.getMatchId().equals(47l)) {
+            if (updatedPoints.equals(MATCH_SEMIS_WIN_POINTS + MATCH_SEMIS_TOSS_WIN_POINTS + MATCH_SEMIS_MOM_WIN_POINTS)) {
+                updatedPoints += SEMIS_BONUS_POINTS;
+            }
+        } else if (match.getMatchId().equals(48l)) {
+            if (updatedPoints.equals(MATCH_FINALS_WIN_POINTS + MATCH_FINALS_TOSS_WIN_POINTS + MATCH_FINALS_MOM_WIN_POINTS)) {
+                updatedPoints += FINALS_BONUS_POINTS;
+            }
+            updatedPoints += evaluatePointsForPlayerPrediction(predictionDto.getUserId(), match);
+        } else {
+            if (updatedPoints.equals(MATCH_WIN_POINTS + TOSS_WIN_POINTS + MOM_WIN_POINTS)) {
+                updatedPoints += BONUS_POINTS;
+            }
         }
         return updatedPoints + existingPoints;
+    }
+
+    private Long evaluatePointsForPlayerPrediction(Long userId, Match finalMatch) {
+        final AddonPredictionDto addonPredictionByUser = predictionService.getAddonPredictionByUser(userId);
+        final AddonPredictionDto addPredictionFinalResult = predictionService.getAddonPredictionByUser(12l);
+        final Date finalMatchDate = finalMatch.getDateTime();
+        Long points = 0l;
+        if (addonPredictionByUser.getPOT().equals(addPredictionFinalResult.getPOT())) {
+            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getPOTDate().toInstant(), finalMatchDate.toInstant());
+            points += daysDiff * POT_POINTS;
+        }
+        if (addonPredictionByUser.getHWT().equals(addPredictionFinalResult.getHWT())) {
+            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getHWTDate().toInstant(), finalMatchDate.toInstant());
+            points += daysDiff * HWT_POINTS;
+        }
+        if (addonPredictionByUser.getHRG().equals(addPredictionFinalResult.getPOT())) {
+            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getHRGDate().toInstant(), finalMatchDate.toInstant());
+            points += daysDiff * HRG_POINTS;
+        }
+        return points;
     }
 
     private long evaluatePointsForMatch(PredictionDto predictionDto, Match match) {
@@ -182,7 +264,12 @@ public class ResultService {
         if (predictionDto.getHomeResult() == null) {
             return MATCH_NO_PREDICT_POINTS;
         } else {
-            return predictionDto.getHomeResult().equals(match.getHomeResult()) ? MATCH_WIN_POINTS : MATCH_LOSE_POINTS;
+            if (match.getMatchId().equals(46l) || match.getMatchId().equals(47l))
+                return predictionDto.getHomeResult().equals(match.getHomeResult()) ? MATCH_SEMIS_WIN_POINTS : MATCH_LOSE_POINTS;
+            else if (match.getMatchId().equals(48l))
+                return predictionDto.getHomeResult().equals(match.getHomeResult()) ? MATCH_FINALS_WIN_POINTS : MATCH_LOSE_POINTS;
+            else
+                return predictionDto.getHomeResult().equals(match.getHomeResult()) ? MATCH_WIN_POINTS : MATCH_LOSE_POINTS;
         }
     }
 
@@ -193,7 +280,12 @@ public class ResultService {
         if (predictionDto.getTossResult() == null) {
             return TOSS_NO_PREDICT_POINTS;
         } else {
-            return predictionDto.getTossResult().equals(match.getTossResult()) ? TOSS_WIN_POINTS : TOSS_LOSE_POINTS;
+            if (match.getMatchId().equals(46l) || match.getMatchId().equals(47l))
+                return predictionDto.getTossResult().equals(match.getTossResult()) ? MATCH_SEMIS_TOSS_WIN_POINTS : TOSS_LOSE_POINTS;
+            else if (match.getMatchId().equals(48l))
+                return predictionDto.getTossResult().equals(match.getTossResult()) ? MATCH_FINALS_TOSS_WIN_POINTS : TOSS_LOSE_POINTS;
+            else
+                return predictionDto.getTossResult().equals(match.getTossResult()) ? TOSS_WIN_POINTS : TOSS_LOSE_POINTS;
         }
     }
 
@@ -204,7 +296,12 @@ public class ResultService {
         if (predictionDto.getMomResult() == null) {
             return MOM_NO_PREDICT_POINTS;
         } else {
-            return predictionDto.getMomResult().equalsIgnoreCase(match.getMomResult()) ? MOM_WIN_POINTS : MOM_LOSE_POINTS;
+            if (match.getMatchId().equals(46l) || match.getMatchId().equals(47l))
+                return predictionDto.getMomResult().equalsIgnoreCase(match.getMomResult()) ? MATCH_SEMIS_MOM_WIN_POINTS : MOM_LOSE_POINTS;
+            else if (match.getMatchId().equals(48l))
+                return predictionDto.getMomResult().equalsIgnoreCase(match.getMomResult()) ? MATCH_FINALS_MOM_WIN_POINTS : MOM_LOSE_POINTS;
+            else
+                return predictionDto.getMomResult().equalsIgnoreCase(match.getMomResult()) ? MOM_WIN_POINTS : MOM_LOSE_POINTS;
         }
     }
 
