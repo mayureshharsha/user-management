@@ -27,11 +27,16 @@ import static com.uam.predictionapp.contants.AppConstants.INITIAL_POINTS;
 
 @Service
 public class ResultService {
+
+    private AddonPredictionDto addPredictionFinalResult;
+
     private final long HRG_POINTS;
 
     private final long HWT_POINTS;
 
     private final long POT_POINTS;
+
+    private final long PLAYER_BONUS_POINTS;
 
     private final long MATCH_FINALS_WIN_POINTS;
 
@@ -108,6 +113,7 @@ public class ResultService {
                          @Value("${game.players.pot}") long potPoints,
                          @Value("${game.players.hrg}") long hrgPoints,
                          @Value("${game.players.hwt}") long hwtPoints,
+                         @Value("${game.players.bonus}") long playerBonusPoints,
                          @Value("${game.semisToss.winPoints}") long semisTossWinPoints,
                          @Value("${game.semisMom.winPoints}") long semisMomWinPoints,
                          @Value("${game.finalsToss.winPoints}") long finalsTossWinPoints,
@@ -151,6 +157,7 @@ public class ResultService {
         POT_POINTS = potPoints;
         HRG_POINTS = hrgPoints;
         HWT_POINTS = hwtPoints;
+        PLAYER_BONUS_POINTS = playerBonusPoints;
     }
 
     public List<ResultDto> listResults() {
@@ -239,21 +246,30 @@ public class ResultService {
 
     private Long evaluatePointsForPlayerPrediction(Long userId, Match finalMatch) {
         final AddonPredictionDto addonPredictionByUser = predictionService.getAddonPredictionByUser(userId);
-        final AddonPredictionDto addPredictionFinalResult = predictionService.getAddonPredictionByUser(12l);
+        if (addonPredictionByUser == null)
+            return 0l;
         final Date finalMatchDate = finalMatch.getDateTime();
         Long points = 0l;
-        if (addonPredictionByUser.getPOT().equals(addPredictionFinalResult.getPOT())) {
-            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getPOTDate().toInstant(), finalMatchDate.toInstant());
+        int counter = 0;
+        if ((addPredictionFinalResult.getPOT()).equals(addonPredictionByUser.getPOT())) {
+            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getPOTDate().toInstant(), finalMatchDate.toInstant()) + 1;
             points += daysDiff * POT_POINTS;
+            counter++;
         }
-        if (addonPredictionByUser.getHWT().equals(addPredictionFinalResult.getHWT())) {
-            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getHWTDate().toInstant(), finalMatchDate.toInstant());
+        if (addPredictionFinalResult.getHWT().equals(addonPredictionByUser.getHWT())) {
+            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getHWTDate().toInstant(), finalMatchDate.toInstant()) + 1;
             points += daysDiff * HWT_POINTS;
+            counter++;
         }
-        if (addonPredictionByUser.getHRG().equals(addPredictionFinalResult.getPOT())) {
-            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getHRGDate().toInstant(), finalMatchDate.toInstant());
+        if (addPredictionFinalResult.getHRG().equals(addonPredictionByUser.getHRG())) {
+            final long daysDiff = ChronoUnit.DAYS.between(addonPredictionByUser.getHRGDate().toInstant(), finalMatchDate.toInstant()) + 1;
             points += daysDiff * HRG_POINTS;
+            counter++;
         }
+        if(counter == 3){
+            points += PLAYER_BONUS_POINTS;
+        }
+
         return points;
     }
 
@@ -306,6 +322,7 @@ public class ResultService {
     }
 
     private void clearAllPoints() {
+        this.addPredictionFinalResult = predictionService.getAddonPredictionByUser(1l);
         resultRepository.setPoints(INITIAL_POINTS);
     }
 
